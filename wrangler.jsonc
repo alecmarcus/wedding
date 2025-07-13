@@ -1,37 +1,42 @@
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "__change_me__",
-	"main": "src/worker.tsx",
-	"compatibility_date": "2025-05-07",
-	"compatibility_flags": ["nodejs_compat"],
-	"assets": {
-		"binding": "ASSETS"
-	},
-	"observability": {
-		"enabled": true
-	},
-	"durable_objects": {
-		"bindings": [
-			{
-				"name": "SESSION_DURABLE_OBJECT",
-				"class_name": "SessionDurableObject"
-			}
-		]
-	},
-	"vars": {
-		"WEBAUTHN_APP_NAME": "__change_me__"
-	},
-	"migrations": [
-		{
-			"tag": "v1",
-			"new_sqlite_classes": ["SessionDurableObject"]
-		}
-	],
-	"d1_databases": [
-		{
-			"binding": "DB",
-			"database_name": "__change_me__",
-			"database_id": "__change_me__"
-		}
-	]
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "wedding",
+  "main": "src/worker.tsx",
+  "compatibility_date": "2025-05-07",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "assets": {
+    "binding": "ASSETS",
+    "directory": "public"
+  },
+  "observability": {
+    "enabled": true
+  },
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "SESSION_DURABLE_OBJECT",
+        "class_name": "SessionDurableObject"
+      }
+    ]
+  },
+  "vars": {
+    "WEBAUTHN_APP_NAME": "wedding-admin"
+  },
+  "migrations": [
+    {
+      "tag": "v1",
+      "new_sqlite_classes": [
+        "SessionDurableObject"
+      ]
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "wedding",
+      "database_id": "842253ad-a404-4d54-81de-498828ba6a65"
+    }
+  ]
 }

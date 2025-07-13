@@ -41,3 +41,30 @@ model Credential {
   @@index([credentialId])
   @@index([userId])
 }
+
+model Rsvp {
+  id                   String   @id @default(uuid())
+  name                 String
+  email                String
+  plusOne              Boolean  @default(false)
+  plusOneName          String?
+  dietaryRestrictions  String?
+  message              String?
+  editToken            String   @unique @default(uuid())
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+  
+  @@index([email])
+  @@index([editToken])
+}
+
+model Photo {
+  id            String   @id @default(uuid())
+  filename      String
+  uploaderName  String?
+  uploaderEmail String?
+  createdAt     DateTime @default(now())
+  
+  @@index([createdAt])
+  @@index([uploaderName])
+}
