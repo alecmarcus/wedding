@@ -1,21 +1,17 @@
-import { env } from "cloudflare:workers";
-import { defineScript } from "rwsdk/worker";
-import { db, setupDb } from "@/db";
+import { env } from "cloudflare:workers"
+import { defineScript } from "rwsdk/worker"
+import { db, setupDb } from "#/db"
 
 export default defineScript(async () => {
-	await setupDb(env);
+  await setupDb(env)
 
-	await db.$executeRawUnsafe(`\
+  // Clean slate for development
+  await db.$executeRawUnsafe(`\
+    DELETE FROM Credential;
     DELETE FROM User;
-    DELETE FROM sqlite_sequence;
-  `);
+    DELETE FROM Rsvp;
+    DELETE FROM Photo;
+  `)
 
-	await db.user.create({
-		data: {
-			id: "1",
-			username: "testuser",
-		},
-	});
-
-	console.log("🌱 Finished seeding");
-});
+  console.log("Database cleared. Visit /admin/setup to create admin account.")
+})

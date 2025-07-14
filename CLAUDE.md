@@ -1,3 +1,14 @@
+- Always plan before you execute. Always consider the impact your changes would have on complexity and coginitive overhead. Strive to reduce it, leaving the code better than you found it. Never introduce a change that confuses or convolutes at any scope, function or codebase.
+- Write principal-level, seasoned-expert, top-tier code. Clear, quality, maintainable, beautiful. Care about your craft.
+- Review your work. Just writing something isn't enough. Be sure you aren't missing anything, didn't make any mistakes, leave dead code, duplicate logic, or fail to deliver on the task at hand in the expected or agreed-upon way.
+- Always prefer arrow functions
+- Maintain types. Write code whose types are clear and inferrable. When you cannot, provide correct, explicit types. Always prefer proper vendor types. If unavailable, use composite vendor types. If impossible, create your own. Types should be extensible and well structured. Avoid `any` and `unknown` and casting with `as`.
+- Do not use enums
+- Avoid interfaces, always prefer types
+- Prefer async/await and try/catch for promises where possible
+- Do not add or create classnames or styles unless you have been instructed to implement a specific design. Do not use tailwind, ever. Do not import 3rd party icon packages unless directed. Do not make visual or design decisions, just write clean, semantic, accessible markup.
+- Pay attention to any existing conventions, linter setups (eslint, biome, oxlint), etc. and do your best to follow them.
+
 <!-- vibe-tools Integration -->
 
 <rwsdk_rwsdk-interruptors>

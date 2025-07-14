@@ -1,16 +1,13 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.1.1/schema.json",
+  "root": true,
   "vcs": {
     "enabled": true,
     "clientKind": "git",
     "useIgnoreFile": false
   },
   "files": {
-    "ignoreUnknown": true,
-    "includes": [
-      "**",
-      "!bun.lock"
-    ]
+    "ignoreUnknown": true
   },
   "assist": {
     "enabled": true,
@@ -29,16 +26,71 @@
   "linter": {
     "enabled": true,
     "rules": {
+      "recommended": true,
       "a11y": "on",
       "complexity": "on",
       "correctness": "on",
       "performance": "on",
-      "nursery": "on",
       "security": "on",
       "style": "on",
-      "suspicious": "on"
+      "suspicious": "on",
+      "nursery": {
+        "noAwaitInLoop": "info",
+        "noConstantBinaryExpression": "error",
+        "noFloatingPromises": "error",
+        "noImportCycles": "error",
+        "noMagicNumbers": "warn",
+        "noMisusedPromises": "error",
+        "noNestedComponentDefinitions": "error",
+        "noNoninteractiveElementInteractions": "warn",
+        "noReactPropAssign": "error",
+        "noUnassignedVariables": "error",
+        "noUnknownAtRule": "info",
+        "noUnresolvedImports": "info",
+        "noUselessBackrefInRegex": "error",
+        "noUselessEscapeInString": "error",
+        "noUselessUndefined": "error",
+        "useAdjacentGetterSetter": "info",
+        "useConsistentObjectDefinition": "error",
+        "useExhaustiveSwitchCases": "error",
+        "useExportsLast": "error",
+        "useIterableCallbackReturn": "info",
+        "useJsonImportAttribute": "error",
+        "useObjectSpread": "error",
+        "useParseIntRadix": "error",
+        "useReadonlyClassProperties": "error",
+        "useUnifiedTypeSignature": "info",
+        "useUniqueElementIds": "error"
+      }
     }
   },
+  "overrides": [
+    {
+      "includes": [
+        "**"
+      ],
+      "linter": {
+        "rules": {
+          "a11y": {
+            "noAutofocus": "off"
+          },
+          "complexity": {
+            "noVoid": "off"
+          },
+          "correctness": {
+            "noNodejsModules": "off",
+            "useImportExtensions": "off"
+          },
+          "style": {
+            "noDefaultExport": "off"
+          },
+          "suspicious": {
+            "noConsole": "warn"
+          }
+        }
+      }
+    }
+  ],
   "javascript": {
     "formatter": {
       "quoteStyle": "double",
