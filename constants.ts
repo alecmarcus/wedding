@@ -1,4 +1,9 @@
 /** biome-ignore-all lint/style/useNamingConvention: Pascal case for proper nouns */
+"use server";
+
+import process from "node:process";
+
+export const IS_DEV = process.env.NODE_ENV === "development";
 
 export const RESPONSE_STATUS = {
   Ok200: {
@@ -197,4 +202,4 @@ export const RESPONSE_STATUS = {
     message: "Network Authentication Required",
     code: 511,
   },
-} as const
+} as const;

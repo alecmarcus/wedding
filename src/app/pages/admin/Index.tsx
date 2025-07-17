@@ -1,21 +1,23 @@
-import { db } from "#/db"
+// import { db } from "#/db";
 
-export const Index = async () => {
-  const rsvpCount = await db.rsvp.count()
-  const photoCount = await db.photo.count()
+import { Link } from "#/app/components/Link";
 
-  const recentRsvps = await db.rsvp.findMany({
-    orderBy: {
-      createdAt: "desc",
-    },
-    take: 5,
-  })
+export const Index = () => {
+  // const rsvpCount = await db.rsvp.count();
+  // const photoCount = await db.photo.count();
+
+  // const recentRsvps = await db.rsvp.findMany({
+  //   orderBy: {
+  //     createdAt: "desc",
+  //   },
+  //   take: 5,
+  // });
 
   return (
     <div>
       <h1>Wedding Admin</h1>
 
-      <div>
+      {/* <div>
         <div>
           <h3>RSVPs</h3>
           <p>{rsvpCount}</p>
@@ -44,11 +46,10 @@ export const Index = async () => {
             ))}
           </div>
         )}
-      </div>
+      </div> */}
 
-      <div>
-        <a href="/admin/logout">Logout</a>
-      </div>
+      <Link to="/">Home</Link>
+      <Link to="/admin/logout">Logout</Link>
     </div>
-  )
-}
+  );
+};

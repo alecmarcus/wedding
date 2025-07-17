@@ -20,14 +20,15 @@
     "types": [
       "./worker-configuration.d.ts",
       "./rw.d.ts",
+      "./rwsdk.d.ts",
       "./vite.d.ts"
     ],
     "paths": {
       "#/*": [
         "./src/*"
       ],
-      "#generated/*": [
-        "./generated/*"
+      "#*": [
+        "./*"
       ]
     },
     /* Enable importing .json files */

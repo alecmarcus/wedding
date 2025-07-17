@@ -1,58 +1,91 @@
-import { type RouteDefinition, route } from "rwsdk/router"
-import { sessions } from "#/session/store"
-import { serverRedirect } from "#/utils/serverRedirect"
-import { isSetupNeeded } from "./functions"
-import { Index } from "./Index"
-import { Login } from "./Login"
-import { Setup } from "./Setup"
+/** biome-ignore-all lint/style/useNamingConvention: "Location" in Response headers */
+
+import { type RouteDefinition, route } from "rwsdk/router";
+import { db } from "#/db";
+import { sessions } from "#/session/store";
+import { RESPONSE_STATUS } from "#constants";
+import { Index } from "./Index";
+import { Login } from "./Login";
+import { Setup } from "./Setup";
+
+const isSetupNeeded = async () => {
+  const userCount = await db.user.count();
+  return userCount === 0;
+};
 
 const setup: RouteDefinition = route("/setup", [
   async () => {
     if (!(await isSetupNeeded())) {
-      return serverRedirect("/admin/login")
+      return new Response(null, {
+        status: RESPONSE_STATUS.Found302.code,
+        headers: {
+          Location: "/admin/login",
+        },
+      });
     }
   },
   Setup,
-])
+]);
 
 const login: RouteDefinition = route("/login", [
   async ({ ctx }) => {
     if (await isSetupNeeded()) {
-      return serverRedirect("/admin/setup")
+      return new Response(null, {
+        status: RESPONSE_STATUS.Found302.code,
+        headers: {
+          Location: "/admin/setup",
+        },
+      });
     }
-
     if (ctx.user) {
-      return serverRedirect("/admin")
+      return new Response(null, {
+        status: RESPONSE_STATUS.Found302.code,
+        headers: {
+          Location: "/admin",
+        },
+      });
     }
   },
   Login,
-])
+]);
 
-const logout: RouteDefinition = route("/logout", async ({ request }) => {
-  const headers = new Headers()
-  await sessions.remove(request, headers)
-  return serverRedirect("/", {
-    status: "Found302",
-    headers,
-  })
-})
+const logout: RouteDefinition = route("/logout", [
+  async ({ request, headers }) => {
+    await sessions.remove(request, headers);
+    return new Response(null, {
+      status: RESPONSE_STATUS.Found302.code,
+      headers: {
+        Location: "/",
+      },
+    });
+  },
+]);
 
 const index: RouteDefinition = route("/", [
   async ({ ctx: { user } }) => {
     if (await isSetupNeeded()) {
-      return serverRedirect("/admin/setup")
+      return new Response(null, {
+        status: RESPONSE_STATUS.Found302.code,
+        headers: {
+          Location: "/admin/setup",
+        },
+      });
     }
-
     if (!user) {
-      return serverRedirect("/admin/login")
+      return new Response(null, {
+        status: RESPONSE_STATUS.Found302.code,
+        headers: {
+          Location: "/admin/login",
+        },
+      });
     }
   },
   Index,
-])
+]);
 
 export const adminRoutes = [
   setup,
   login,
-  logout,
   index,
-]
+  logout,
+];

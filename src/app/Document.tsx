@@ -1,18 +1,7 @@
-const ErrorBoundary = ({ children }: { children: React.ReactNode }) => {
-  try {
-    return children
-  } catch (e) {
-    if (e instanceof Error) {
-      return <div>Error: {e.message}</div>
-    }
+const TITLE = "Soyeon & Alec";
 
-    if (typeof e === "string") {
-      return <div>Error: {e} </div>
-    }
-
-    return <div>Error: {JSON.stringify(e)}</div>
-  }
-}
+const ROOT_ID = "root";
+const CLIENT_SCRIPT = "/src/client.tsx";
 
 export const Document = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -20,16 +9,13 @@ export const Document = ({ children }: { children: React.ReactNode }) => {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>@redwoodjs/starter-standard</title>
-        <link rel="modulepreload" href="/src/client.tsx" />
+        <title>{TITLE}</title>
+        <link rel="modulepreload" href={CLIENT_SCRIPT} />
       </head>
       <body>
-        {/** biome-ignore lint/nursery/useUniqueElementIds: Must be "root" */}
-        <div id="root">
-          <ErrorBoundary>{children}</ErrorBoundary>
-        </div>
-        <script>import("/src/client.tsx")</script>
+        <div id={ROOT_ID}>{children}</div>
+        <script type="module" src={CLIENT_SCRIPT} />
       </body>
     </html>
-  )
-}
+  );
+};

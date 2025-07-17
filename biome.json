@@ -18,12 +18,22 @@
     }
   },
   "formatter": {
+    "includes": [
+      "**",
+      "!rwsdk.d.ts",
+      "!bun.lock"
+    ],
     "enabled": true,
     "indentStyle": "space",
     "bracketSameLine": false,
     "expand": "always"
   },
   "linter": {
+    "includes": [
+      "**",
+      "!rwsdk.d.ts",
+      "!bun.lock"
+    ],
     "enabled": true,
     "rules": {
       "recommended": true,
@@ -95,7 +105,7 @@
     "formatter": {
       "quoteStyle": "double",
       "arrowParentheses": "asNeeded",
-      "semicolons": "asNeeded",
+      "semicolons": "always",
       "trailingCommas": "es5"
     }
   },

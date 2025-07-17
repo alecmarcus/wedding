@@ -1,35 +1,39 @@
-import { env } from "cloudflare:workers"
-import type { RouteMiddleware } from "rwsdk/router"
-import { ErrorResponse } from "rwsdk/worker"
-import { db, setupDb } from "#/db"
-import { RESPONSE_STATUS } from "#/utils/responseStatus"
-import { sessions, setupSessionStore } from "./store"
+import { env } from "cloudflare:workers";
+import type { RouteMiddleware } from "rwsdk/router";
+import { ErrorResponse } from "rwsdk/worker";
+import { db, setupDb } from "#/db";
+import { RESPONSE_STATUS } from "#constants";
+import { setupSessionStore } from "./store";
 
 export const sessionMiddleware: RouteMiddleware = async ({
   ctx,
   request,
   headers,
 }) => {
-  await setupDb(env)
-  setupSessionStore(env)
+  await setupDb(env);
+  const sessions = setupSessionStore(env);
 
   try {
-    ctx.session = await sessions.load(request)
+    ctx.session = await sessions.load(request);
   } catch (error) {
     if (
       error instanceof ErrorResponse &&
-      error.code === RESPONSE_STATUS.Forbidden403.code
+      (
+        [
+          RESPONSE_STATUS.Forbidden403.code,
+          RESPONSE_STATUS.Unauthorized401.code,
+        ] as number[]
+      ).includes(error.code)
     ) {
-      await sessions.remove(request, headers)
-      headers.set("Location", "/admin/login")
-
+      await sessions.remove(request, headers);
+      headers.set("Location", "/");
       return new Response(null, {
-        status: 302,
+        status: RESPONSE_STATUS.Found302.code,
         headers,
-      })
+      });
     }
 
-    throw error
+    throw error;
   }
 
   if (ctx.session?.userId) {
@@ -37,6 +41,6 @@ export const sessionMiddleware: RouteMiddleware = async ({
       where: {
         id: ctx.session.userId,
       },
-    })
+    });
   }
-}
+};
