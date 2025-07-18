@@ -1,19 +1,18 @@
-/** biome-ignore-all lint/style/useNamingConvention: "optionsJSON" vendor property name */
 "use client";
 
+import { navigate } from "@@/navigation";
 import {
   startAuthentication,
   startRegistration,
 } from "@simplewebauthn/browser";
 import { useCallback, useState, useTransition } from "react";
-import { navigate } from "#/app/util/navigation";
-import { IS_DEV } from "#constants";
+import { IS_DEV } from "rwsdk/constants";
 import {
   finishPasskeyLogin,
   finishPasskeyRegistration,
   startPasskeyLogin,
   startPasskeyRegistration,
-} from "./actions";
+} from "./functions";
 
 export const useLoginAction = () => {
   const [isSuccess, setIsSuccess] = useState(false);
@@ -29,7 +28,7 @@ export const useLoginAction = () => {
       const success = await finishPasskeyLogin(authentication);
 
       if (success) {
-        navigate("/admin/");
+        navigate("/admin");
       } else {
         IS_DEV && console.log("Login failed");
       }
@@ -44,7 +43,9 @@ export const useLoginAction = () => {
   }, []);
 
   const action = useCallback(() => {
-    startTransition(transition);
+    startTransition(async () => {
+      await transition();
+    });
   }, [
     transition,
   ]);
@@ -89,7 +90,9 @@ export const useSetupAction = () => {
   }, []);
 
   const action = useCallback(() => {
-    startTransition(transition);
+    startTransition(async () => {
+      await transition();
+    });
   }, [
     transition,
   ]);

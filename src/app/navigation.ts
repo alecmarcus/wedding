@@ -2,7 +2,7 @@ import { defineLinks } from "rwsdk/router";
 
 export const link = defineLinks([
   "/",
-  "/admin/",
+  "/admin",
   "/admin/setup",
   "/admin/login",
   "/admin/logout",

@@ -1,7 +1,7 @@
 "use client";
 
-import { Link } from "#/app/components/Link";
-import { useSetupAction } from "./hooks";
+import { Link } from "@@/components/Link";
+import { useSetupAction } from "../auth/hooks";
 
 export const Setup = () => {
   const [setup, { isPending }] = useSetupAction();

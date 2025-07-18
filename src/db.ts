@@ -1,9 +1,9 @@
-import { PrismaD1 } from "@prisma/adapter-d1"
-import { PrismaClient } from "#generated/prisma"
+import { PrismaD1 } from "@prisma/adapter-d1";
+import { PrismaClient } from "~/generated/prisma";
 
-export type * from "#generated/prisma"
+export type * from "~/generated/prisma";
 
-export let db: PrismaClient
+export let db: PrismaClient;
 
 // context(justinvdm, 21-05-2025): We need to instantiate the client via a
 // function rather that at the module level for several reasons:
@@ -19,8 +19,8 @@ export const setupDb = async (env: Env) => {
     // it works
     // @ts-ignore
     adapter: new PrismaD1(env.DB),
-  })
+  });
 
   // context(justinvdm, 21-05-2025): https://github.com/cloudflare/workers-sdk/pull/8283
-  await db.$queryRaw`SELECT 1`
-}
+  await db.$queryRaw`SELECT 1`;
+};

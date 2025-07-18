@@ -1,9 +1,9 @@
-import { env } from "cloudflare:workers"
-import { defineScript } from "rwsdk/worker"
-import { db, setupDb } from "#/db"
+import { env } from "cloudflare:workers";
+import { defineScript } from "rwsdk/worker";
+import { db, setupDb } from "@/db";
 
 export default defineScript(async () => {
-  await setupDb(env)
+  await setupDb(env);
 
   // Clean slate for development
   await db.$executeRawUnsafe(`\
@@ -11,7 +11,7 @@ export default defineScript(async () => {
     DELETE FROM User;
     DELETE FROM Rsvp;
     DELETE FROM Photo;
-  `)
+  `);
 
-  console.log("Database cleared. Visit /admin/setup to create admin account.")
-})
+  console.log("Database cleared. Visit /admin/setup to create admin account.");
+});

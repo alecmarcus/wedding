@@ -37,6 +37,7 @@
     "@simplewebauthn/server": "^13.1.1",
     "react": "^19.1.0",
     "react-server-dom-webpack": "19.2.0-canary-39cad7af-20250411",
+    "resend": "^4.6.0",
     "rwsdk": "0.1.14"
   },
   "devDependencies": {
@@ -44,8 +45,8 @@
     "@cloudflare/vite-plugin": "1.7.4",
     "@cloudflare/workers-types": "^4.20250407.0",
     "@types/node": "^22.14.0",
-    "@types/react": "^19.1.2",
-    "@types/react-dom": "^19.1.2",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.2",
     "prisma": "~6.8.2",

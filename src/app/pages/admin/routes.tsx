@@ -1,12 +1,10 @@
-/** biome-ignore-all lint/style/useNamingConvention: "Location" in Response headers */
-
+import { RESPONSE_STATUS } from "@@/constants";
 import { type RouteDefinition, route } from "rwsdk/router";
-import { db } from "#/db";
-import { sessions } from "#/session/store";
-import { RESPONSE_STATUS } from "#constants";
-import { Index } from "./Index";
-import { Login } from "./Login";
-import { Setup } from "./Setup";
+import { db } from "@/db";
+import { sessions } from "@/session/store";
+import { Admin } from "./Admin";
+import { Login } from "./pages/Login";
+import { Setup } from "./pages/Setup";
 
 const isSetupNeeded = async () => {
   const userCount = await db.user.count();
@@ -80,7 +78,7 @@ const index: RouteDefinition = route("/", [
       });
     }
   },
-  Index,
+  Admin,
 ]);
 
 export const adminRoutes = [

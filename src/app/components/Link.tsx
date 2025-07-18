@@ -1,4 +1,4 @@
-import { type Href, link } from "#/app/util/navigation";
+import { type Href, link } from "@@/navigation";
 
 export const Link = ({
   to,

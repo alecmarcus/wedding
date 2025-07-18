@@ -22,40 +22,44 @@ datasource db {
 }
 
 model User {
-  id          String      @id @default(uuid()) // User ID (UUID-based)
-  username    String      @unique
-  createdAt   DateTime    @default(now())
+  id        String   @id @default(uuid()) // User ID (UUID-based)
+  username  String   @unique
+  createdAt DateTime @default(now())
 
   credentials Credential[] // Relationship: One user can have many credentials
 }
 
 model Credential {
-  id            String   @id @default(uuid()) // Internal DB ID
-  userId        String   @unique // Every credential is linked to a specific user
-  user          User     @relation(fields: [userId], references: [id])
-  createdAt     DateTime @default(now())
-  credentialId  String   @unique // WebAuthn credential identifier
-  publicKey     Bytes
-  counter       Int      @default(0)
-  
+  id           String   @id @default(uuid()) // Internal DB ID
+  userId       String   @unique // Every credential is linked to a specific user
+  user         User     @relation(fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+  credentialId String   @unique // WebAuthn credential identifier
+  publicKey    Bytes
+  counter      Int      @default(0)
+
   @@index([credentialId])
   @@index([userId])
 }
 
 model Rsvp {
-  id                   String   @id @default(uuid())
-  name                 String
-  email                String
-  plusOne              Boolean  @default(false)
-  plusOneName          String?
-  dietaryRestrictions  String?
-  message              String?
-  editToken            String   @unique @default(uuid())
-  createdAt            DateTime @default(now())
-  updatedAt            DateTime @updatedAt
-  
+  id                  String   @id @default(uuid())
+  name                String
+  email               String
+  plusOne             Boolean  @default(false)
+  plusOneName         String?
+  dietaryRestrictions String?
+  message             String?
+  editToken           String   @unique @default(uuid())
+  uploadToken         String   @unique @default(uuid())
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  photos Photo[] // Relationship: One RSVP can have many photos
+
   @@index([email])
   @@index([editToken])
+  @@index([uploadToken])
 }
 
 model Photo {
@@ -63,8 +67,11 @@ model Photo {
   filename      String
   uploaderName  String?
   uploaderEmail String?
+  rsvpId        String? // Link to RSVP
+  rsvp          Rsvp?    @relation(fields: [rsvpId], references: [id], onDelete: Cascade)
   createdAt     DateTime @default(now())
-  
+
   @@index([createdAt])
   @@index([uploaderName])
+  @@index([rsvpId])
 }

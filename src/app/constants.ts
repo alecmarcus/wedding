@@ -1,10 +1,50 @@
-/** biome-ignore-all lint/style/useNamingConvention: Pascal case for proper nouns */
-"use server";
+const ONE_MB = 1024 ^ 2;
+const mb = (amount: number) => amount * ONE_MB;
 
-import process from "node:process";
+export const MAX_FILE_SIZE = mb(10);
+export const MAX_PHOTOS_PER_RSVP = 50;
+export const ALLOWED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+];
 
-export const IS_DEV = process.env.NODE_ENV === "development";
+export const ERRORS = {
+  RSVP_EXISTS: "An RSVP with this email already exists",
+  INVALID_TOKEN: "Invalid or expired token",
+  PHOTO_UPLOAD_FAILED: "Failed to upload photo. Please try again.",
+  EMAIL_SEND_FAILED:
+    "Failed to send email. Please contact us if this persists.",
+} as const;
 
+export const SUCCESS = {
+  RSVP_SUBMITTED: "Thank you! Your RSVP has been submitted successfully.",
+  RSVP_UPDATED: "Your RSVP has been updated successfully.",
+  PHOTO_UPLOADED: "Photo uploaded successfully!",
+  EMAIL_SENT: "Email sent successfully!",
+} as const;
+
+export const RSVP_FORM_FIELDS = {
+  NAME: "name",
+  EMAIL: "email",
+  PLUS_ONE: "plusOne",
+  PLUS_ONE_NAME: "plusOneName",
+  DIETARY_RESTRICTIONS: "dietaryRestrictions",
+  MESSAGE: "message",
+} as const;
+
+export const UPLOAD_FORM_FIELDS = {
+  PHOTO: "photo",
+} as const;
+
+export const BULK_EMAIL_FORM_FIELDS = {
+  SUBJECT: "subject",
+  CONTENT: "content",
+} as const;
+
+export const TURNSTILE_SITE_KEY = "0x4AAAAAABlj58ON6nBeTtY2";
 export const RESPONSE_STATUS = {
   Ok200: {
     message: "OK",

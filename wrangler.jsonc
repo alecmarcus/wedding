@@ -22,7 +22,8 @@
     ]
   },
   "vars": {
-    "WEBAUTHN_APP_NAME": "wedding-admin"
+    "WEBAUTHN_APP_NAME": "Wedding Admin",
+    "FROM_EMAIL": "Soyeon & Alec <noreply@soyeonmarried.alecmarc.us>"
   },
   "migrations": [
     {
@@ -37,6 +38,12 @@
       "binding": "DB",
       "database_name": "wedding",
       "database_id": "842253ad-a404-4d54-81de-498828ba6a65"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "bucket_name": "wedding-photos",
+      "binding": "wedding_photos"
     }
   ]
 }

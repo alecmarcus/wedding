@@ -1,7 +1,7 @@
 "use client";
 
-import { Link } from "#/app/components/Link";
-import { useLoginAction } from "./hooks";
+import { Link } from "@@/components/Link";
+import { useLoginAction } from "../auth/hooks";
 
 export const Login = () => {
   const [login, { isPending, isSuccess }] = useLoginAction();

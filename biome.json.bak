@@ -4,7 +4,7 @@
   "vcs": {
     "enabled": true,
     "clientKind": "git",
-    "useIgnoreFile": true
+    "useIgnoreFile": false
   },
   "files": {
     "ignoreUnknown": true,
@@ -73,7 +73,7 @@
         "noReactPropAssign": "error",
         "noUnassignedVariables": "error",
         "noUnknownAtRule": "info",
-        "noUnresolvedImports": "off",
+        "noUnresolvedImports": "info",
         "noUselessBackrefInRegex": "error",
         "noUselessEscapeInString": "error",
         "noUselessUndefined": "error",

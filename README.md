@@ -11,15 +11,15 @@ This "standard starter" is the recommended implementation for RedwoodSDK. You ge
 ## Creating your project
 
 ```shell
-npx create-rwsdk my-project-name
+bunx create-rwsdk my-project-name
 cd my-project-name
-pnpm install
+bun install
 ```
 
 ## Running the dev server
 
 ```shell
-pnpm dev
+bun dev
 ```
 
 Point your browser to the URL displayed in the terminal (e.g. `http://localhost:5173/`). You should see a "Hello World" message in your browser.
@@ -35,7 +35,7 @@ Within your project's `wrangler.jsonc`:
 - Create a new D1 database:
 
 ```shell
-npx wrangler d1 create my-project-db
+bunx wrangler d1 create my-project-db
 ```
 
 Copy the database ID provided and paste it into your project's `wrangler.jsonc` file:
