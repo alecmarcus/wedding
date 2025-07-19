@@ -1,5 +1,8 @@
-import { useCallback, useState, useTransition } from "react";
-import { resendConfirmationEmail, sendBulkEmailToGuests } from "./functions";
+"use client";
+
+import { useActionState, useCallback, useState, useTransition } from "react";
+import { sendBulkEmail } from "./actions";
+import { resendConfirmationEmail } from "./functions";
 
 export const useResendConfirmation = () => {
   const [isPending, startTransition] = useTransition();
@@ -46,62 +49,16 @@ export const useResendConfirmation = () => {
   ] as const;
 };
 
-export const useSendBulkEmail = () => {
-  const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [data, setData] =
-    useState<Awaited<ReturnType<typeof sendBulkEmailToGuests>>["data"]>(null);
-
-  const reset = useCallback(() => {
-    setIsSuccess(false);
-    setError(null);
-    setData(null);
-  }, []);
-
-  const transition = useCallback(
-    async (subject: string, content: string) => {
-      try {
-        reset();
-
-        const response = await sendBulkEmailToGuests(subject, content);
-
-        if (response.success && response.data) {
-          setIsSuccess(true);
-          setData(response.data);
-        } else {
-          throw new Error(response.error || "Unknown error");
-        }
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : JSON.stringify(error);
-        setError(`"Failed to send bulk email": ${errorMessage}`);
-      }
-    },
-    [
-      reset,
-    ]
-  );
-
-  const action = useCallback(
-    ({ subject, content }: { subject: string; content: string }) => {
-      startTransition(async () => {
-        await transition(subject, content);
-      });
-    },
-    [
-      transition,
-    ]
-  );
+export const useBulkEmailAction = (
+  initial: Parameters<typeof sendBulkEmail>[0]
+) => {
+  const [state, action, isPending] = useActionState(sendBulkEmail, initial);
 
   return [
     action,
     {
-      data,
-      error,
+      ...state,
       isPending,
-      isSuccess,
-      reset,
     },
   ] as const;
 };

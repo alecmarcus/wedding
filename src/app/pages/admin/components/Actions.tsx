@@ -1,123 +1,132 @@
 "use client";
 
-import { BULK_EMAIL_FORM_FIELDS } from "@@/constants";
-import { useId, useRef, useState } from "react";
-import { useSendBulkEmail } from "../email/hooks";
+import { BULK_EMAIL_FIELDS } from "@@/constants";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
+import type { ActionState } from "../email/actions";
+import { useBulkEmailAction } from "../email/hooks";
 
-const BulkEmailForm = () => {
+const Summary = ({
+  successCount,
+  total,
+  failureCount,
+  failures,
+}: NonNullable<ActionState["data"]>) => {
+  return (
+    <>
+      <p>{successCount === total ? "All" : successCount} Sent</p>
+      {failureCount > 0 && (
+        <>
+          <p>{failureCount} Failed</p>
+          <ul>
+            {failures.map(({ email, error }) => (
+              <li key={email}>
+                <details>
+                  <summary>{email}</summary>
+                  {error}
+                </details>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </>
+  );
+};
+
+const BulkEmailForm = ({
+  onSubmit,
+}: {
+  onSubmit?: (status: ActionState) => void;
+}) => {
   const ref = useRef<HTMLFormElement>(null);
-  const [subject, setSubject] = useState("");
-  const [content, setContent] = useState("");
   const subjectId = useId();
   const contentId = useId();
 
-  const [sendBulkEmail, { isPending, isSuccess, error, data, reset }] =
-    useSendBulkEmail();
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    sendBulkEmail({
-      subject,
-      content,
+  const [bulkEmailAction, { isPending, isSuccess, error, data }] =
+    useBulkEmailAction({
+      data: null,
+      error: null,
+      isSuccess: null,
     });
-  };
 
-  const handleReset = () => {
-    ref.current?.reset();
-    setSubject("");
-    setContent("");
-    reset();
-  };
-
-  if (isSuccess && data) {
-    return (
-      <div>
-        <h3>
-          {data.successCount === data.total ? "All" : data.successCount} Sent
-        </h3>
-        {data.failureCount > 0 && (
-          <>
-            <h4>{data.failureCount} Failed</h4>
-            <ul>
-              {data.failures.map(({ email, error }) => (
-                <li key={email}>
-                  <details>
-                    <summary>{email}</summary>
-                    {error}
-                  </details>
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
-        <button type="button" onClick={handleReset}>
-          Send Another Email
-        </button>
-      </div>
-    );
-  }
+  useEffect(() => {
+    if (!isPending && data && (isSuccess || error)) {
+      onSubmit?.({
+        data,
+        error,
+        isSuccess,
+      });
+    }
+  }, [
+    isPending,
+    data,
+    isSuccess,
+    error,
+    onSubmit,
+  ]);
 
   return (
-    <form ref={ref} onSubmit={handleSubmit}>
-      <h3>Send Bulk Email to All Guests</h3>
+    <>
+      <form ref={ref} action={bulkEmailAction}>
+        <h3>Send Bulk Email to All Guests</h3>
 
-      {error && (
+        <label htmlFor={subjectId}>
+          Subject *
+          <input
+            type="text"
+            id={subjectId}
+            name={BULK_EMAIL_FIELDS.subject.name}
+            maxLength={BULK_EMAIL_FIELDS.subject.max}
+            required={true}
+            disabled={isPending}
+          />
+        </label>
+
+        <label htmlFor={contentId}>
+          Email Content *
+          <textarea
+            id={contentId}
+            name={BULK_EMAIL_FIELDS.content.name}
+            maxLength={BULK_EMAIL_FIELDS.content.max}
+            rows={10}
+            required={true}
+            disabled={isPending}
+            placeholder="Enter the email content here. Basic HTML is supported."
+          />
+          <p>
+            Tip: You can use basic HTML for formatting (e.g., &lt;p&gt;,
+            &lt;strong&gt;, &lt;em&gt;, &lt;br&gt;)
+          </p>
+        </label>
+
+        <button type="submit" disabled={isPending}>
+          {isPending ? "Sending..." : "Send Email"}
+        </button>
+      </form>
+
+      {error && !isSuccess && !isPending && (
         <div role="alert">
           <p>{error}</p>
         </div>
       )}
 
-      <div>
-        <label htmlFor={subjectId}>Subject *</label>
-        <input
-          type="text"
-          id={subjectId}
-          name={BULK_EMAIL_FORM_FIELDS.SUBJECT}
-          value={subject}
-          onChange={e => setSubject(e.target.value)}
-          required={true}
-          disabled={isPending}
-        />
-      </div>
-
-      <div>
-        <label htmlFor={contentId}>Email Content *</label>
-        <textarea
-          id={contentId}
-          name={BULK_EMAIL_FORM_FIELDS.CONTENT}
-          rows={10}
-          value={content}
-          onChange={e => setContent(e.target.value)}
-          required={true}
-          disabled={isPending}
-          placeholder="Enter the email content here. Basic HTML is supported."
-        />
-        <p>
-          Tip: You can use basic HTML for formatting (e.g., &lt;p&gt;,
-          &lt;strong&gt;, &lt;em&gt;, &lt;br&gt;)
-        </p>
-      </div>
-
-      <button type="submit" disabled={isPending || !subject || !content}>
-        {isPending ? "Sending..." : "Send Email"}
-      </button>
-    </form>
+      {isSuccess && data && <Summary {...data} />}
+    </>
   );
 };
 
 export const Actions = () => {
-  const [showBulkEmail, setShowBulkEmail] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const toggleShowForm = useCallback(() => {
+    setShowForm(c => !c);
+  }, []);
 
   return (
     <>
-      <button type="button" onClick={() => setShowBulkEmail(!showBulkEmail)}>
-        {showBulkEmail ? "Hide Bulk Email Form" : "Send Bulk Email"}
+      {showForm && <BulkEmailForm onSubmit={toggleShowForm} />}
+      <button type="button" onClick={toggleShowForm}>
+        {showForm ? "Cancel" : "Send Bulk Email"}
       </button>
-      {showBulkEmail && (
-        <div>
-          <BulkEmailForm />
-        </div>
-      )}
     </>
   );
 };

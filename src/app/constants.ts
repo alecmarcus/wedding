@@ -1,7 +1,6 @@
 const ONE_MB = 1024 ^ 2;
 const mb = (amount: number) => amount * ONE_MB;
 
-const MIN_REQ = 1;
 const MAX_NAME = 75;
 const MAX_DIET = 500;
 const MAX_MESSAGE = 1000;
@@ -9,7 +8,6 @@ const MAX_MESSAGE = 1000;
 export const RSVP_FIELDS = {
   name: {
     name: "name",
-    min: MIN_REQ,
     max: MAX_NAME,
   },
   email: {
@@ -22,17 +20,14 @@ export const RSVP_FIELDS = {
   },
   plusOneName: {
     name: "plusOneName",
-    min: MIN_REQ,
     max: MAX_NAME,
   },
   dietaryRestrictions: {
     name: "dietaryRestrictions",
-    min: 0,
     max: MAX_DIET,
   },
   message: {
     name: "message",
-    min: 0,
     max: MAX_MESSAGE,
   },
 } as const;
@@ -62,13 +57,21 @@ export const SUCCESS = {
   EMAIL_SENT: "Email sent successfully!",
 } as const;
 
-export const UPLOAD_FORM_FIELDS = {
-  PHOTO: "photo",
+export const UPLOAD_PHOTO_FIELDS = {
+  photo: {
+    name: "photo",
+  },
 } as const;
 
-export const BULK_EMAIL_FORM_FIELDS = {
-  SUBJECT: "subject",
-  CONTENT: "content",
+export const BULK_EMAIL_FIELDS = {
+  subject: {
+    name: "subject",
+    max: 80,
+  },
+  content: {
+    name: "content",
+    max: 1000,
+  },
 } as const;
 
 export const TURNSTILE_SITE_KEY = "0x4AAAAAABlj58ON6nBeTtY2";

@@ -1,6 +1,6 @@
 "use server";
 
-import { sendBulkEmail, sendRsvpConfirmationEmail } from "@@/email";
+import { sendRsvpConfirmationEmail } from "@@/email";
 import { requestInfo } from "rwsdk/worker";
 import { db } from "@/db";
 
@@ -35,6 +35,7 @@ export const resendConfirmationEmail = async (rsvpId: string) => {
 
     return {
       success: true,
+      error: null,
     };
   } catch (error) {
     return {
@@ -43,45 +44,6 @@ export const resendConfirmationEmail = async (rsvpId: string) => {
         error instanceof Error
           ? error.message
           : JSON.stringify(error) || "Unknown error",
-    };
-  }
-};
-
-export const sendBulkEmailToGuests = async (
-  subject: string,
-  content: string
-) => {
-  try {
-    const rsvps = await db.rsvp.findMany({
-      select: {
-        email: true,
-      },
-    });
-
-    const emails = rsvps.map(rsvp => rsvp.email);
-
-    if (emails.length === 0) {
-      return {
-        success: false,
-        error: "No RSVPs found",
-      };
-    }
-
-    const data = await sendBulkEmail(emails, subject, content);
-
-    return {
-      success: true,
-      data,
-      error: null,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      data: null,
-      error:
-        error instanceof Error
-          ? error.message
-          : JSON.stringify(error) || "Failed to send bulk email",
     };
   }
 };

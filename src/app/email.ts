@@ -16,7 +16,6 @@ export const sendEmail = async (
   });
 
   if (error) {
-    console.error("Failed to send email:", error);
     throw new Error(`Failed to send email: ${error.message}`);
   }
 
@@ -162,77 +161,5 @@ We look forward to celebrating with you!
     subject: "Wedding RSVP Updated",
     html,
     text,
-  }).then(r => console.log("sent update email", r));
-};
-
-export const sendBulkEmail = async (
-  recipients: string[],
-  subject: string,
-  content: string
-) => {
-  const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-      ${content}
-    </div>
-  `;
-  const emails = recipients.map(async recipient => {
-    try {
-      const result = await sendEmail({
-        to: recipient,
-        subject,
-        html,
-        text: content.replace(/<[^>]*>/g, ""),
-      });
-      return {
-        recipient,
-        success: true,
-        data: result,
-      };
-    } catch (error) {
-      return {
-        recipient,
-        success: false,
-        data: null,
-        error: error instanceof Error ? error.message : String(error),
-      };
-    }
   });
-
-  const results = await Promise.allSettled(emails);
-
-  const successes: string[] = [];
-  const failures: {
-    email: string;
-    error?: string;
-  }[] = [];
-  results.forEach((result, index) => {
-    const recipient = recipients[index];
-
-    if (result.status === "fulfilled") {
-      if (result.value.success) {
-        successes.push(recipient);
-      } else {
-        failures.push({
-          email: recipient,
-          error: result.value.error,
-        });
-      }
-    } else {
-      failures.push({
-        email: recipient,
-        error:
-          result.reason instanceof Error
-            ? result.reason.message
-            : String(result.reason),
-      });
-    }
-  });
-
-  return {
-    successes,
-    failures,
-    total: recipients.length,
-    successCount: successes.length,
-    failureCount: failures.length,
-  };
 };

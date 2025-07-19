@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { RSVP_FIELDS } from "@/app/constants";
 import type { Rsvp } from "@/db";
 import { useRsvpAction } from "./hooks";
@@ -54,13 +61,19 @@ export const RsvpForm = ({
 }) => {
   const ref = useRef<HTMLFormElement>(null);
 
-  const [onSubmit, { isSuccess, isPending, error, data: rsvp }] = useRsvpAction(
-    {
+  const nameId = useId();
+  const emailId = useId();
+  const plusOneId = useId();
+  const plusOneNameId = useId();
+  const dietaryRestrictionsId = useId();
+  const messageId = useId();
+
+  const [rsvpAction, { isSuccess, isPending, error, data: rsvp }] =
+    useRsvpAction({
       data: initialRsvp,
       error: null,
       isSuccess: null,
-    }
-  );
+    });
 
   const [isEditing, setIsEditing] = useState(true);
   const [submissionType, setSubmissionType] = useState<
@@ -112,7 +125,7 @@ export const RsvpForm = ({
   }
 
   return (
-    <form ref={ref} action={onSubmit}>
+    <form ref={ref} action={rsvpAction}>
       <h2>{title}</h2>
 
       {error && (
@@ -122,38 +135,42 @@ export const RsvpForm = ({
       )}
 
       <div>
-        <label htmlFor={RSVP_FIELDS.name.name}>Name *</label>
-        <input
-          type="text"
-          id={RSVP_FIELDS.name.name}
-          name={RSVP_FIELDS.name.name}
-          maxLength={RSVP_FIELDS.name.max}
-          minLength={RSVP_FIELDS.name.min}
-          defaultValue={rsvp?.name}
-          required={true}
-          disabled={isPending}
-          readOnly={submissionType === "update"}
-        />
+        <label htmlFor={nameId}>
+          Name *
+          <input
+            type="text"
+            id={nameId}
+            name={RSVP_FIELDS.name.name}
+            maxLength={RSVP_FIELDS.name.max}
+            defaultValue={rsvp?.name}
+            required={true}
+            disabled={isPending}
+            readOnly={submissionType === "update"}
+          />
+        </label>
       </div>
 
       <div>
-        <label htmlFor={RSVP_FIELDS.email.name}>Email *</label>
-        <input
-          type="email"
-          id={RSVP_FIELDS.email.name}
-          name={RSVP_FIELDS.email.name}
-          maxLength={RSVP_FIELDS.email.max}
-          defaultValue={rsvp?.email}
-          required={true}
-          disabled={isPending}
-          readOnly={submissionType === "update"}
-        />
+        <label htmlFor={emailId}>
+          Email *
+          <input
+            type="email"
+            id={emailId}
+            name={RSVP_FIELDS.email.name}
+            maxLength={RSVP_FIELDS.email.max}
+            defaultValue={rsvp?.email}
+            required={true}
+            disabled={isPending}
+            readOnly={submissionType === "update"}
+          />
+        </label>
       </div>
 
       <div>
-        <label>
+        <label htmlFor={plusOneId}>
           <input
             type="checkbox"
+            id={plusOneId}
             name={RSVP_FIELDS.plusOne.name}
             maxLength={RSVP_FIELDS.plusOne.max}
             value="true"
@@ -167,42 +184,46 @@ export const RsvpForm = ({
 
       {hasPlusOne && (
         <div>
-          <label htmlFor={RSVP_FIELDS.plusOneName.name}>Plus One Name</label>
-          <input
-            type="text"
-            id={RSVP_FIELDS.plusOneName.name}
-            name={RSVP_FIELDS.plusOneName.name}
-            maxLength={RSVP_FIELDS.plusOneName.max}
-            defaultValue={rsvp?.plusOneName || ""}
-            disabled={isPending}
-          />
+          <label htmlFor={plusOneNameId}>
+            Plus One Name
+            <input
+              type="text"
+              id={plusOneNameId}
+              name={RSVP_FIELDS.plusOneName.name}
+              maxLength={RSVP_FIELDS.plusOneName.max}
+              defaultValue={rsvp?.plusOneName || ""}
+              disabled={isPending}
+            />
+          </label>
         </div>
       )}
 
       <div>
-        <label htmlFor={RSVP_FIELDS.dietaryRestrictions.name}>
+        <label htmlFor={dietaryRestrictionsId}>
           Dietary Restrictions
+          <textarea
+            id={dietaryRestrictionsId}
+            name={RSVP_FIELDS.dietaryRestrictions.name}
+            maxLength={RSVP_FIELDS.dietaryRestrictions.max}
+            rows={3}
+            defaultValue={rsvp?.dietaryRestrictions || ""}
+            disabled={isPending}
+          />
         </label>
-        <textarea
-          id={RSVP_FIELDS.dietaryRestrictions.name}
-          name={RSVP_FIELDS.dietaryRestrictions.name}
-          maxLength={RSVP_FIELDS.dietaryRestrictions.max}
-          rows={3}
-          defaultValue={rsvp?.dietaryRestrictions || ""}
-          disabled={isPending}
-        />
       </div>
 
       <div>
-        <label htmlFor={RSVP_FIELDS.message.name}>Message for the Couple</label>
-        <textarea
-          id={RSVP_FIELDS.message.name}
-          name={RSVP_FIELDS.message.name}
-          maxLength={RSVP_FIELDS.message.max}
-          rows={4}
-          defaultValue={rsvp?.message || ""}
-          disabled={isPending}
-        />
+        <label htmlFor={messageId}>
+          Message for the Couple
+          <textarea
+            id={messageId}
+            name={RSVP_FIELDS.message.name}
+            maxLength={RSVP_FIELDS.message.max}
+            rows={4}
+            defaultValue={rsvp?.message || ""}
+            disabled={isPending}
+          />
+        </label>
       </div>
 
       {onCancelUpdating && submissionType === "update" && (
