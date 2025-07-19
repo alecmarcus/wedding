@@ -1,47 +1,48 @@
-"use client";
+// "use client";
 
-import { PhotoItem } from "@@/components/PhotoItem";
-import { useEffect, useState } from "react";
-import type { Photo } from "@/db";
-import {
-  useGetPhotos,
-  // useGetRsvpInfo
-} from "./hooks";
-import { UploadForm } from "./UploadForm";
+// import { useEffect, useState } from "react";
+// import { PhotoItem } from "@/app/features/photos/components/PhotoItem";
+// import type { Photo } from "@/db";
 
-const PhotoList = ({ photos }: { photos: Photo[] }) => {
-  if (photos.length === 0) {
-    return null;
-  }
+// import {
+//   useGetPhotos,
+//   // useGetRsvpInfo
+// } from "./hooks";
+// import { UploadForm } from "./UploadForm";
 
-  return (
-    <div>
-      <h3>Your Uploaded Photos ({photos.length})</h3>
-      <div>
-        {photos.map(photo => (
-          <PhotoItem
-            key={photo.id}
-            photo={photo}
-            showUploader={false}
-            showDate={true}
-          />
-        ))}
-      </div>
-    </div>
-  );
-};
+// const PhotoList = ({ photos }: { photos: Photo[] }) => {
+//   if (photos.length === 0) {
+//     return null;
+//   }
+
+//   return (
+//     <div>
+//       <h3>Your Uploaded Photos ({photos.length})</h3>
+//       <div>
+//         {photos.map(photo => (
+//           <PhotoItem
+//             key={photo.id}
+//             photo={photo}
+//             showUploader={false}
+//             showDate={true}
+//           />
+//         ))}
+//       </div>
+//     </div>
+//   );
+// };
 
 export const UploadPage = () => {
-  const [token, setToken] = useState<string | null>(null);
+  // const [token, setToken] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Get token from URL search params
-    const searchParams = new URLSearchParams(window.location.search);
-    const tokenParam = searchParams.get("token");
-    setToken(tokenParam);
-  }, []);
+  // useEffect(() => {
+  //   // Get token from URL search params
+  //   const searchParams = new URLSearchParams(window.location.search);
+  //   const tokenParam = searchParams.get("token");
+  //   setToken(tokenParam);
+  // }, []);
 
-  return "Wip";
+  return <h1>Wip</h1>;
   // const {
   //   rsvpInfo,
   //   isLoading: isLoadingRsvp,

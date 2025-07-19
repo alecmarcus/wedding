@@ -1,19 +1,19 @@
 "use server";
 
-import { sendEmail } from "@@/email";
 import { maxLength, object, parse, pipe, string } from "valibot";
-import { BULK_EMAIL_FIELDS } from "@/app/constants";
 import { db } from "@/db";
+import { BULK_SEND_FIELDS } from "./fields";
+import { sendEmail } from "./functions";
 
 const bulkEmailSchema = object({
-  subject: pipe(string(), maxLength(BULK_EMAIL_FIELDS.subject.max)),
-  content: pipe(string(), maxLength(BULK_EMAIL_FIELDS.content.max)),
+  subject: pipe(string(), maxLength(BULK_SEND_FIELDS.subject.max)),
+  content: pipe(string(), maxLength(BULK_SEND_FIELDS.content.max)),
 });
 
 const parseAndValidateFormData = (formData: FormData) => {
   const rawData = {
-    subject: formData.get(BULK_EMAIL_FIELDS.subject.name) as string,
-    content: formData.get(BULK_EMAIL_FIELDS.content.name) as string,
+    subject: formData.get(BULK_SEND_FIELDS.subject.name) as string,
+    content: formData.get(BULK_SEND_FIELDS.content.name) as string,
   };
 
   return parse(bulkEmailSchema, rawData);

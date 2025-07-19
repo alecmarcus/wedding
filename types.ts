@@ -1,7 +1,9 @@
 export type EmptyObject = Record<PropertyKey, never>;
+
 export type DistributiveOmit<T, K extends string> = T extends unknown
   ? Omit<T, K>
   : never;
+
 export type NonNullableMembers<
   T,
   Deep extends boolean = false,

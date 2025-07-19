@@ -11,6 +11,7 @@ import type {
   // Rsvp
 } from "@/db";
 import {
+  deletePhoto,
   getPhotosByRsvp,
   // getRsvpByUploadToken,
   uploadPhoto,
@@ -76,11 +77,11 @@ export const useUploadPhoto = () => {
         setError(null);
         const result = await uploadPhoto(uploadToken, formData);
 
-        if (result.success && result.data) {
+        if (result.isSuccess && result.data) {
           setIsSuccess(true);
           setUploadedPhoto(result.data);
         } else {
-          setError(result.error || "Failed to upload photo");
+          throw new Error(result.error || "Unknown error");
         }
 
         return result;
@@ -176,6 +177,51 @@ export const useGetPhotos = () => {
     action,
     {
       data: photos,
+      error,
+      isPending,
+      isSuccess,
+    },
+  ] as const;
+};
+
+export const useDeletePhotoRequest = () => {
+  const [isPending, startTransition] = useTransition();
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const transition = useCallback(async (photoId: string) => {
+    try {
+      setError(null);
+      setIsSuccess(false);
+
+      const result = await deletePhoto(photoId);
+
+      if (result.success) {
+        setIsSuccess(true);
+      } else {
+        throw new Error(result.error || "Unknown error");
+      }
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : JSON.stringify(error);
+      setError(`Failed to delete photo: ${errorMessage}`);
+    }
+  }, []);
+
+  const request = useCallback(
+    ({ photoId }: { photoId: string }) => {
+      startTransition(async () => {
+        await transition(photoId);
+      });
+    },
+    [
+      transition,
+    ]
+  );
+
+  return [
+    request,
+    {
       error,
       isPending,
       isSuccess,

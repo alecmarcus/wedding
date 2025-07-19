@@ -1,7 +1,7 @@
 import { Image } from "@@/components/Image";
 import type { Photo } from "@/db";
 
-type PhotoItemProps = {
+type Props = {
   photo: Photo;
   showUploader?: boolean;
   showDate?: boolean;
@@ -11,7 +11,7 @@ export const PhotoItem = ({
   photo,
   showUploader = true,
   showDate = true,
-}: PhotoItemProps) => {
+}: Props) => {
   return (
     <div>
       <Image

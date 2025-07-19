@@ -1,12 +1,10 @@
 "use server";
 
-import { RSVP_FIELDS } from "@@/constants";
 import {
   sendRsvpConfirmationEmail,
   sendRsvpExistsEmail,
   sendRsvpUpdateEmail,
-} from "@@/email";
-import { requestInfo } from "rwsdk/worker";
+} from "@@/features/email/functions";
 import {
   boolean,
   email,
@@ -18,6 +16,7 @@ import {
   string,
 } from "valibot";
 import { db, type Rsvp } from "@/db";
+import { RSVP_FIELDS } from "./fields";
 
 const rsvpSchema = object({
   name: pipe(string(), maxLength(RSVP_FIELDS.name.max)),
@@ -31,11 +30,15 @@ const rsvpSchema = object({
 });
 
 const parseAndValidateFormData = (formData: FormData) => {
+  const plusOne = !!formData.get(RSVP_FIELDS.plusOne.name);
+
   const rawData = {
     name: formData.get(RSVP_FIELDS.name.name) as string,
     email: formData.get(RSVP_FIELDS.email.name) as string,
-    plusOne: formData.get(RSVP_FIELDS.plusOne.name) === "true",
-    plusOneName: formData.get(RSVP_FIELDS.plusOneName.name) as string | null,
+    plusOne,
+    plusOneName: plusOne
+      ? (formData.get(RSVP_FIELDS.plusOneName.name) as string)
+      : null,
     dietaryRestrictions: formData.get(RSVP_FIELDS.dietaryRestrictions.name) as
       | string
       | null,
@@ -52,9 +55,6 @@ const createRsvp = async ({
   email,
   ...data
 }: ParsedFormData): Promise<ActionState> => {
-  const { request } = requestInfo;
-  const origin = new URL(request.url).origin;
-
   try {
     const existingRsvp = await db.rsvp.findFirst({
       where: {
@@ -63,7 +63,9 @@ const createRsvp = async ({
     });
 
     if (existingRsvp) {
-      await sendRsvpExistsEmail(existingRsvp, origin);
+      await sendRsvpExistsEmail({
+        rsvp: existingRsvp,
+      });
       throw new Error("An RSVP with this email already exists");
     }
   } catch (error) {
@@ -86,7 +88,9 @@ const createRsvp = async ({
       },
     });
 
-    await sendRsvpConfirmationEmail(rsvp, origin);
+    await sendRsvpConfirmationEmail({
+      rsvp,
+    });
 
     return {
       isSuccess: true,
@@ -145,7 +149,9 @@ const updateRsvp = async ({
         },
       });
 
-      await sendRsvpUpdateEmail(updatedRsvp, origin);
+      await sendRsvpUpdateEmail({
+        rsvp: updatedRsvp,
+      });
 
       return {
         isSuccess: true,

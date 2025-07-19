@@ -42,8 +42,8 @@
   ],
   "r2_buckets": [
     {
+      "binding": "PHOTOS",
       "bucket_name": "wedding-photos",
-      "binding": "wedding_photos"
     }
   ]
 }

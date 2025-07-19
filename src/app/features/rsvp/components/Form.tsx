@@ -6,9 +6,9 @@ import {
   useRef,
   useState,
 } from "react";
-import { RSVP_FIELDS } from "@/app/constants";
 import type { Rsvp } from "@/db";
-import { useRsvpAction } from "./hooks";
+import { RSVP_FIELDS } from "../fields";
+import { useRsvpAction } from "../hooks";
 
 type RsvpFormSuccessProps = {
   submissionType: "update" | "create";
@@ -94,7 +94,7 @@ export const RsvpForm = ({
     onDoneEditing,
   ]);
 
-  const [hasPlusOne, setHasPlusOne] = useState(initialRsvp?.plusOne);
+  const [hasPlusOne, setHasPlusOne] = useState(initialRsvp?.plusOne ?? true);
   const handlePlusOneChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const isChecked = event.target.checked;
@@ -172,8 +172,7 @@ export const RsvpForm = ({
             type="checkbox"
             id={plusOneId}
             name={RSVP_FIELDS.plusOne.name}
-            maxLength={RSVP_FIELDS.plusOne.max}
-            value="true"
+            checked={hasPlusOne}
             defaultChecked={rsvp?.plusOne}
             disabled={isPending}
             onChange={handlePlusOneChange}
@@ -182,21 +181,24 @@ export const RsvpForm = ({
         </label>
       </div>
 
-      {hasPlusOne && (
-        <div>
-          <label htmlFor={plusOneNameId}>
-            Plus One Name
-            <input
-              type="text"
-              id={plusOneNameId}
-              name={RSVP_FIELDS.plusOneName.name}
-              maxLength={RSVP_FIELDS.plusOneName.max}
-              defaultValue={rsvp?.plusOneName || ""}
-              disabled={isPending}
-            />
-          </label>
-        </div>
-      )}
+      <div
+        style={{
+          display: hasPlusOne ? "block" : "none",
+        }}
+      >
+        <label htmlFor={plusOneNameId}>
+          Plus One Name *
+          <input
+            type="text"
+            id={plusOneNameId}
+            required={hasPlusOne}
+            name={RSVP_FIELDS.plusOneName.name}
+            maxLength={RSVP_FIELDS.plusOneName.max}
+            defaultValue={rsvp?.plusOneName || undefined}
+            disabled={isPending}
+          />
+        </label>
+      </div>
 
       <div>
         <label htmlFor={dietaryRestrictionsId}>
@@ -206,7 +208,7 @@ export const RsvpForm = ({
             name={RSVP_FIELDS.dietaryRestrictions.name}
             maxLength={RSVP_FIELDS.dietaryRestrictions.max}
             rows={3}
-            defaultValue={rsvp?.dietaryRestrictions || ""}
+            defaultValue={rsvp?.dietaryRestrictions || undefined}
             disabled={isPending}
           />
         </label>
@@ -220,7 +222,7 @@ export const RsvpForm = ({
             name={RSVP_FIELDS.message.name}
             maxLength={RSVP_FIELDS.message.max}
             rows={4}
-            defaultValue={rsvp?.message || ""}
+            defaultValue={rsvp?.message || undefined}
             disabled={isPending}
           />
         </label>

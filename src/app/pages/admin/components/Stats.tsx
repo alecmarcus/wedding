@@ -1,4 +1,4 @@
-import { getRsvpStats } from "../rsvp/functions";
+import { getRsvpStats } from "@@/features/rsvp/functions";
 
 export const Stats = async () => {
   const stats = await getRsvpStats();

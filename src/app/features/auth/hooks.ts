@@ -13,7 +13,7 @@ import {
   startPasskeyRegistration,
 } from "./functions";
 
-export const useLoginAction = () => {
+export const useLoginRequest = () => {
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<null | string>(null);
@@ -42,7 +42,7 @@ export const useLoginAction = () => {
     }
   }, []);
 
-  const action = useCallback(() => {
+  const request = useCallback(() => {
     startTransition(async () => {
       await transition();
     });
@@ -51,7 +51,7 @@ export const useLoginAction = () => {
   ]);
 
   return [
-    action,
+    request,
     {
       error,
       isPending,
@@ -60,7 +60,7 @@ export const useLoginAction = () => {
   ] as const;
 };
 
-export const useSetupAction = () => {
+export const useSetupRequest = () => {
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -92,7 +92,7 @@ export const useSetupAction = () => {
     }
   }, []);
 
-  const action = useCallback(() => {
+  const request = useCallback(() => {
     startTransition(async () => {
       await transition();
     });
@@ -101,7 +101,7 @@ export const useSetupAction = () => {
   ]);
 
   return [
-    action,
+    request,
     {
       error,
       isPending,

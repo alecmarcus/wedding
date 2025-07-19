@@ -1,10 +1,10 @@
 "use client";
 
+import { resendConfirmationEmail } from "@@/features/email/functions";
 import { useActionState, useCallback, useState, useTransition } from "react";
 import { sendBulkEmail } from "./actions";
-import { resendConfirmationEmail } from "./functions";
 
-export const useResendConfirmation = () => {
+export const useResendConfirmationRequest = () => {
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -14,7 +14,9 @@ export const useResendConfirmation = () => {
       setError(null);
       setIsSuccess(false);
 
-      const result = await resendConfirmationEmail(rsvpId);
+      const result = await resendConfirmationEmail({
+        rsvpId,
+      });
 
       if (result.success) {
         setIsSuccess(true);
@@ -28,7 +30,7 @@ export const useResendConfirmation = () => {
     }
   }, []);
 
-  const action = useCallback(
+  const request = useCallback(
     ({ rsvpId }: { rsvpId: string }) => {
       startTransition(async () => {
         await transition(rsvpId);
@@ -40,7 +42,7 @@ export const useResendConfirmation = () => {
   );
 
   return [
-    action,
+    request,
     {
       error,
       isPending,
@@ -52,10 +54,10 @@ export const useResendConfirmation = () => {
 export const useBulkEmailAction = (
   initial: Parameters<typeof sendBulkEmail>[0]
 ) => {
-  const [state, action, isPending] = useActionState(sendBulkEmail, initial);
+  const [state, request, isPending] = useActionState(sendBulkEmail, initial);
 
   return [
-    action,
+    request,
     {
       ...state,
       isPending,

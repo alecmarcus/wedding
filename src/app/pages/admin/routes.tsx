@@ -2,9 +2,9 @@ import { RESPONSE_STATUS } from "@@/constants";
 import { type RouteDefinition, route } from "rwsdk/router";
 import { db } from "@/db";
 import { sessions } from "@/session/store";
-import { Admin } from "./Admin";
-import { Login } from "./pages/Login";
-import { Setup } from "./pages/Setup";
+import { Admin } from ".";
+import { Login } from "./login";
+import { Setup } from "./setup";
 
 const isSetupNeeded = async () => {
   const userCount = await db.user.count();

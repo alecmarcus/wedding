@@ -1,10 +1,10 @@
 "use client";
 
 import { Link } from "@@/components/Link";
-import { useLoginAction } from "../auth/hooks";
+import { useLoginRequest } from "@@/features/auth/hooks";
 
 export const Login = () => {
-  const [login, { isPending, isSuccess }] = useLoginAction();
+  const [login, { isPending, isSuccess }] = useLoginRequest();
 
   return (
     <div>

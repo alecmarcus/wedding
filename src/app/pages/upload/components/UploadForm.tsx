@@ -1,8 +1,8 @@
 "use client";
 
-import { UPLOAD_PHOTO_FIELDS } from "@@/constants";
+import { UPLOAD_PHOTO_FIELDS } from "@@/features/photo/fields";
+import { useUploadPhoto } from "@@/features/photo/hooks";
 import { useRef } from "react";
-import { useUploadPhoto } from "./hooks";
 
 type UploadFormProps = {
   uploadToken: string;

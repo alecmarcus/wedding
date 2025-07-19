@@ -1,80 +1,9 @@
-const ONE_MB = 1024 ^ 2;
-const mb = (amount: number) => amount * ONE_MB;
+const ONE_MiB = 1024 ^ 2;
+const ONE_S = 1000;
 
-const MAX_NAME = 75;
-const MAX_DIET = 500;
-const MAX_MESSAGE = 1000;
+export const mib = (mebibytes: number) => mebibytes * ONE_MiB;
+export const sec = (seconds: number) => seconds * ONE_S;
 
-export const RSVP_FIELDS = {
-  name: {
-    name: "name",
-    max: MAX_NAME,
-  },
-  email: {
-    name: "email",
-    max: MAX_NAME,
-  },
-  plusOne: {
-    name: "plusOne",
-    max: MAX_NAME,
-  },
-  plusOneName: {
-    name: "plusOneName",
-    max: MAX_NAME,
-  },
-  dietaryRestrictions: {
-    name: "dietaryRestrictions",
-    max: MAX_DIET,
-  },
-  message: {
-    name: "message",
-    max: MAX_MESSAGE,
-  },
-} as const;
-
-export const MAX_FILE_SIZE = mb(10);
-export const MAX_PHOTOS_PER_RSVP = 50;
-export const ALLOWED_IMAGE_TYPES = [
-  "image/jpeg",
-  "image/jpg",
-  "image/png",
-  "image/gif",
-  "image/webp",
-];
-
-export const ERRORS = {
-  RSVP_EXISTS: "An RSVP with this email already exists",
-  INVALID_TOKEN: "Invalid or expired token",
-  PHOTO_UPLOAD_FAILED: "Failed to upload photo. Please try again.",
-  EMAIL_SEND_FAILED:
-    "Failed to send email. Please contact us if this persists.",
-} as const;
-
-export const SUCCESS = {
-  RSVP_SUBMITTED: "Thank you! Your RSVP has been submitted successfully.",
-  RSVP_UPDATED: "Your RSVP has been updated successfully.",
-  PHOTO_UPLOADED: "Photo uploaded successfully!",
-  EMAIL_SENT: "Email sent successfully!",
-} as const;
-
-export const UPLOAD_PHOTO_FIELDS = {
-  photo: {
-    name: "photo",
-  },
-} as const;
-
-export const BULK_EMAIL_FIELDS = {
-  subject: {
-    name: "subject",
-    max: 80,
-  },
-  content: {
-    name: "content",
-    max: 1000,
-  },
-} as const;
-
-export const TURNSTILE_SITE_KEY = "0x4AAAAAABlj58ON6nBeTtY2";
 export const RESPONSE_STATUS = {
   Ok200: {
     message: "OK",

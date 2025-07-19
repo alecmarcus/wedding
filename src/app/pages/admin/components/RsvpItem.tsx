@@ -1,12 +1,13 @@
 "use client";
 
 import { Image } from "@@/components/Image";
-import { useCallback, useMemo, useState } from "react";
-import { RsvpForm } from "@/app/features/rsvp/Form";
+import { sec } from "@@/constants";
+import { useResendConfirmationRequest } from "@@/features/email/hooks";
+import { useDeletePhotoRequest } from "@@/features/photo/hooks";
+import { useDeleteRsvpRequest } from "@@/features/rsvp/hooks";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { RsvpForm } from "@/app/features/rsvp/components/Form";
 import type { Photo, Rsvp } from "@/db";
-import { useResendConfirmation } from "../email/hooks";
-import { useDeletePhoto } from "../photo/hooks";
-import { useDeleteRsvp } from "../rsvp/hooks";
 
 type RsvpWithPhotos = Rsvp & {
   photos: Pick<Photo, "id" | "filename" | "createdAt">[];
@@ -28,9 +29,15 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
       isSuccess: isDeletedRsvp,
       error: errorDeletingRsvp,
     },
-  ] = useDeleteRsvp();
-  const [resendConfirmation, { isPending: isResendingConfirmation }] =
-    useResendConfirmation();
+  ] = useDeleteRsvpRequest();
+  const [
+    resendConfirmation,
+    {
+      isPending: isResendPending,
+      isSuccess: isResendSuccess,
+      error: resendError,
+    },
+  ] = useResendConfirmationRequest();
 
   const deleteRsvpText = useMemo(() => {
     if (isDeletingRsvp) {
@@ -69,8 +76,26 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
     rsvp.id,
   ]);
 
+  const [resendConfirmationText, setResendConfirmationText] = useState<
+    null | string
+  >(null);
+  useEffect(() => {
+    if (!isResendPending && (isResendSuccess || resendError)) {
+      setResendConfirmationText(isResendSuccess ? "Sent" : resendError);
+      const timeout = setTimeout(() => {
+        setResendConfirmationText(null);
+      }, sec(1));
+
+      return () => clearTimeout(timeout);
+    }
+  }, [
+    isResendPending,
+    isResendSuccess,
+    resendError,
+  ]);
+
   const [showPhotos, setShowPhotos] = useState(false);
-  const [deletePhoto, { isPending: isDeletingPhoto }] = useDeletePhoto();
+  const [deletePhoto, { isPending: isDeletingPhoto }] = useDeletePhotoRequest();
 
   const handleDeletePhoto = useCallback(
     (photoId: string) => {
@@ -119,10 +144,11 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
           <button
             type="button"
             onClick={handleResendConfirmation}
-            disabled={isResendingConfirmation || isEditing}
+            disabled={isResendPending || isEditing}
           >
-            {isResendingConfirmation ? "Sending..." : "Resend Confirmation"}
+            {isResendPending ? "Sending..." : "Resend Confirmation"}
           </button>
+          {resendConfirmationText}
           {rsvp.photos.length > 0 && (
             <button type="button" onClick={() => setShowPhotos(!showPhotos)}>
               {showPhotos ? "Hide Photos" : "View Photos"}

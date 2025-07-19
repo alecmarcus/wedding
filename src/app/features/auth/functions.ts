@@ -1,6 +1,5 @@
 "use server";
 
-import { TURNSTILE_SITE_KEY } from "@@/constants";
 import { env } from "cloudflare:workers";
 import {
   type AuthenticationResponseJSON,
@@ -112,7 +111,7 @@ export const startPasskeyRegistration = async (username: string) => {
   const { headers } = requestInfo;
 
   const verifyTurnstile = await verifyTurnstileToken({
-    token: TURNSTILE_SITE_KEY,
+    token: env.TURNSTILE_SITE_KEY,
     secretKey: env.TURNSTILE_SECRET_KEY,
   });
   if (!verifyTurnstile) {

@@ -1,8 +1,7 @@
 import { Link } from "@@/components/Link";
+import { getAllPhotos } from "@@/features/photo/functions";
 import { PhotoGallery } from "@@/pages/home/components/PhotoGallery";
-import { RsvpModalWrapper } from "@@/pages/home/components/RsvpModalWrapper";
-import { getAllPhotos } from "@@/pages/home/functions";
-import { Suspense } from "react";
+import { RsvpModal } from "@@/pages/home/components/RsvpModal";
 
 const PhotoSection = async () => {
   const photos = await getAllPhotos();
@@ -26,18 +25,9 @@ export const Home = () => {
         <a href="/?rsvp">RSVP Now</a>
       </div>
 
-      <RsvpModalWrapper />
+      <RsvpModal />
 
-      <Suspense
-        fallback={
-          <div>
-            <h2>Wedding Photos</h2>
-            <p>Loading photos...</p>
-          </div>
-        }
-      >
-        <PhotoSection />
-      </Suspense>
+      <PhotoSection />
 
       <div>
         <Link to="/admin">Admin</Link>

@@ -1,9 +1,9 @@
 "use client";
 
-import { BULK_EMAIL_FIELDS } from "@@/constants";
+import type { ActionState } from "@@/features/email/actions";
+import { BULK_SEND_FIELDS } from "@@/features/email/fields";
+import { useBulkEmailAction } from "@@/features/email/hooks";
 import { useCallback, useEffect, useId, useRef, useState } from "react";
-import type { ActionState } from "../email/actions";
-import { useBulkEmailAction } from "../email/hooks";
 
 const Summary = ({
   successCount,
@@ -75,8 +75,8 @@ const BulkEmailForm = ({
           <input
             type="text"
             id={subjectId}
-            name={BULK_EMAIL_FIELDS.subject.name}
-            maxLength={BULK_EMAIL_FIELDS.subject.max}
+            name={BULK_SEND_FIELDS.subject.name}
+            maxLength={BULK_SEND_FIELDS.subject.max}
             required={true}
             disabled={isPending}
           />
@@ -86,8 +86,8 @@ const BulkEmailForm = ({
           Email Content *
           <textarea
             id={contentId}
-            name={BULK_EMAIL_FIELDS.content.name}
-            maxLength={BULK_EMAIL_FIELDS.content.max}
+            name={BULK_SEND_FIELDS.content.name}
+            maxLength={BULK_SEND_FIELDS.content.max}
             rows={10}
             required={true}
             disabled={isPending}

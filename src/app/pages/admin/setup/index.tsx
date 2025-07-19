@@ -1,10 +1,10 @@
 "use client";
 
 import { Link } from "@@/components/Link";
-import { useSetupAction } from "../auth/hooks";
+import { useSetupRequest } from "@@/features/auth/hooks";
 
 export const Setup = () => {
-  const [setup, { isPending }] = useSetupAction();
+  const [setup, { isPending }] = useSetupRequest();
 
   return (
     <div>
