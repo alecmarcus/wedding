@@ -68,7 +68,7 @@ export const useUploadPhoto = () => {
   const [error, setError] = useState<string | null>(null);
   const [uploadedPhoto, setUploadedPhoto] = useState<{
     id: string;
-    filename: string;
+    fileName: string;
   } | null>(null);
 
   const transition = useCallback(
@@ -138,7 +138,7 @@ export const useGetPhotos = () => {
       setIsSuccess(false);
 
       if (!uploadToken) {
-        setError("No token provided");
+        setError("No upload token provided");
         return;
       }
 

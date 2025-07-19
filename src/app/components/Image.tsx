@@ -1,4 +1,4 @@
-type ImageProps = {
+type Props = {
   src: string;
   alt: string;
   width?: number;
@@ -9,6 +9,7 @@ type ImageProps = {
 };
 
 const fileNameRegex = /\.[^/.]+$/;
+
 export const Image = ({
   src,
   alt,
@@ -17,13 +18,11 @@ export const Image = ({
   loading = "lazy",
   sizes = "100vw",
   className,
-}: ImageProps) => {
-  // Extract filename without extension
+}: Props) => {
   const srcWithoutExt = src.replace(fileNameRegex, "");
 
   return (
     <picture className={className}>
-      {/* Modern formats */}
       <source
         type="image/avif"
         srcSet={`${srcWithoutExt}.avif`}
@@ -34,8 +33,6 @@ export const Image = ({
         srcSet={`${srcWithoutExt}.webp`}
         sizes={sizes}
       />
-
-      {/* Fallback to original format */}
       <img
         src={src}
         alt={alt}

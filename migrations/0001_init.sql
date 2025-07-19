@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "username" TEXT NOT NULL,
+    "userName" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -26,6 +26,7 @@ CREATE TABLE "Rsvp" (
     "dietaryRestrictions" TEXT,
     "message" TEXT,
     "editToken" TEXT NOT NULL,
+    "uploadToken" TEXT NOT NULL,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" DATETIME NOT NULL
 );
@@ -33,14 +34,16 @@ CREATE TABLE "Rsvp" (
 -- CreateTable
 CREATE TABLE "Photo" (
     "id" TEXT NOT NULL PRIMARY KEY,
-    "filename" TEXT NOT NULL,
+    "fileName" TEXT NOT NULL,
     "uploaderName" TEXT,
     "uploaderEmail" TEXT,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "rsvpId" TEXT,
+    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "Photo_rsvpId_fkey" FOREIGN KEY ("rsvpId") REFERENCES "Rsvp" ("id") ON DELETE CASCADE ON UPDATE CASCADE
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
+CREATE UNIQUE INDEX "User_userName_key" ON "User"("userName");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Credential_userId_key" ON "Credential"("userId");
@@ -58,13 +61,23 @@ CREATE INDEX "Credential_userId_idx" ON "Credential"("userId");
 CREATE UNIQUE INDEX "Rsvp_editToken_key" ON "Rsvp"("editToken");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Rsvp_uploadToken_key" ON "Rsvp"("uploadToken");
+
+-- CreateIndex
 CREATE INDEX "Rsvp_email_idx" ON "Rsvp"("email");
 
 -- CreateIndex
 CREATE INDEX "Rsvp_editToken_idx" ON "Rsvp"("editToken");
 
 -- CreateIndex
+CREATE INDEX "Rsvp_uploadToken_idx" ON "Rsvp"("uploadToken");
+
+-- CreateIndex
 CREATE INDEX "Photo_createdAt_idx" ON "Photo"("createdAt");
 
 -- CreateIndex
 CREATE INDEX "Photo_uploaderName_idx" ON "Photo"("uploaderName");
+
+-- CreateIndex
+CREATE INDEX "Photo_rsvpId_idx" ON "Photo"("rsvpId");
+

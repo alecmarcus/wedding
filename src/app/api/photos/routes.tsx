@@ -3,13 +3,13 @@ import { route } from "rwsdk/router";
 import type { RequestInfo } from "rwsdk/worker";
 
 export type PhotosApiRequest = RequestInfo<{
-  filename: string;
+  fileName: string;
 }>;
 
 export const photoRoutes = [
-  route<PhotosApiRequest>("/:filename", async ({ params: { filename } }) => {
+  route<PhotosApiRequest>("/:fileName", async ({ params: { fileName } }) => {
     try {
-      const object = await env.PHOTOS.get(filename);
+      const object = await env.PHOTOS.get(fileName);
 
       if (!object) {
         return new Response("Photo not found", {

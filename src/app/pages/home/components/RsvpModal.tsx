@@ -2,12 +2,12 @@
 
 import { Link } from "@@/components/Link";
 import { RsvpForm } from "@@/features/rsvp/components/Form";
-import { useGetRsvpByTokenRequest } from "@@/features/rsvp/hooks";
+import { useGetRsvpByEditTokenRequest } from "@@/features/rsvp/hooks";
 import { useEffect, useState } from "react";
 
 export const RsvpModal = () => {
-  const [getRsvpByToken, { isPending, data: rsvp, error }] =
-    useGetRsvpByTokenRequest();
+  const [getRsvpByEditToken, { isPending, data: rsvp, error }] =
+    useGetRsvpByEditTokenRequest();
 
   const [searchParams, setSearchParams] = useState<URLSearchParams>();
   const showRsvp = !!searchParams?.has("rsvp");
@@ -16,14 +16,14 @@ export const RsvpModal = () => {
     const params = new URLSearchParams(window.location.search);
     setSearchParams(params);
 
-    const token = params?.get("token");
-    if (typeof token === "string") {
-      getRsvpByToken({
-        token,
+    const editToken = params?.get("token");
+    if (typeof editToken === "string") {
+      getRsvpByEditToken({
+        editToken,
       });
     }
   }, [
-    getRsvpByToken,
+    getRsvpByEditToken,
   ]);
 
   if (!showRsvp) {

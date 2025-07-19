@@ -15,7 +15,7 @@ export const PhotoItem = ({
   return (
     <div>
       <Image
-        src={`/api/photos/${photo.filename}`}
+        src={`/api/photos/${photo.fileName}`}
         alt={`Uploaded${
           photo.uploaderName ? ` by ${photo.uploaderName}` : ""
         } on ${new Date(photo.createdAt).toLocaleDateString()}`}

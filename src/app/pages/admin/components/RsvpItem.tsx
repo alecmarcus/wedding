@@ -10,7 +10,7 @@ import { RsvpForm } from "@/app/features/rsvp/components/Form";
 import type { Photo, Rsvp } from "@/db";
 
 type RsvpWithPhotos = Rsvp & {
-  photos: Pick<Photo, "id" | "filename" | "createdAt">[];
+  photos: Pick<Photo, "id" | "fileName" | "createdAt">[];
 };
 
 export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
@@ -171,7 +171,7 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
           {rsvp.photos.map(photo => (
             <div key={photo.id}>
               <Image
-                src={`/api/photos/${photo.filename}`}
+                src={`/api/photos/${photo.fileName}`}
                 alt={`Uploaded by ${rsvp.name}`}
               />
               <p>Uploaded: {new Date(photo.createdAt).toLocaleDateString()}</p>

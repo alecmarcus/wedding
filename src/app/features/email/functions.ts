@@ -42,15 +42,11 @@ export const sendRsvpConfirmationEmail = ({ rsvp }: { rsvp: Rsvp }) => {
   });
 };
 
-export const resendConfirmationEmail = async ({
-  rsvpId,
-}: {
-  rsvpId: string;
-}) => {
+export const resendConfirmationEmail = async ({ id }: { id: string }) => {
   try {
     const rsvp = await db.rsvp.findUnique({
       where: {
-        id: rsvpId,
+        id,
       },
     });
 

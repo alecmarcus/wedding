@@ -23,7 +23,7 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid()) // User ID (UUID-based)
-  username  String   @unique
+  userName  String   @unique
   createdAt DateTime @default(now())
 
   credentials Credential[] // Relationship: One user can have many credentials
@@ -64,7 +64,7 @@ model Rsvp {
 
 model Photo {
   id            String   @id @default(uuid())
-  filename      String
+  fileName      String
   uploaderName  String?
   uploaderEmail String?
   rsvpId        String? // Link to RSVP

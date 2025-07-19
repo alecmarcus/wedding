@@ -34,7 +34,7 @@ export const deletePhoto = async ({ id }: { id: string }) => {
       throw new Error("Photo not found");
     }
 
-    await env.PHOTOS.delete(photo.filename);
+    await env.PHOTOS.delete(photo.fileName);
 
     await db.photo.delete({
       where: {
@@ -61,7 +61,7 @@ export const getRsvpByUploadToken = async ({
 }) => {
   try {
     if (!uploadToken) {
-      throw new Error("Invalid token");
+      throw new Error("Invalid upload token");
     }
 
     const rsvp = await db.rsvp.findUnique({
@@ -139,18 +139,18 @@ export const uploadPhoto = async (uploadToken: string, formData: FormData) => {
     const timestamp = Date.now();
     const randomString = crypto.randomUUID();
     const extension = file.name.split(".").pop();
-    const filename = `${timestamp}-${randomString}.${extension}`;
+    const fileName = `${timestamp}-${randomString}.${extension}`;
 
     // TODO: Upload to storage service (R2, etc.)
     // For now, we'll just save the metadata
     // In production, you would upload the file to R2 here
     // const { env } = requestInfo;
-    // await env.BUCKET.put(filename, file);
+    // await env.BUCKET.put(fileName, file);
 
     // Save photo metadata
     const photo = await db.photo.create({
       data: {
-        filename,
+        fileName,
         uploaderName: rsvp.name,
         uploaderEmail: rsvp.email,
         rsvpId: rsvp.id,
@@ -162,7 +162,7 @@ export const uploadPhoto = async (uploadToken: string, formData: FormData) => {
       error: null,
       data: {
         id: photo.id,
-        filename: photo.filename,
+        fileName: photo.fileName,
       },
     };
   } catch (error) {

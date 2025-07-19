@@ -9,13 +9,13 @@ export const useResendConfirmationRequest = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const transition = useCallback(async (rsvpId: string) => {
+  const transition = useCallback(async ({ id }: { id: string }) => {
     try {
       setError(null);
       setIsSuccess(false);
 
       const result = await resendConfirmationEmail({
-        rsvpId,
+        id,
       });
 
       if (result.success) {
@@ -31,9 +31,11 @@ export const useResendConfirmationRequest = () => {
   }, []);
 
   const request = useCallback(
-    ({ rsvpId }: { rsvpId: string }) => {
+    ({ id }: { id: string }) => {
       startTransition(async () => {
-        await transition(rsvpId);
+        await transition({
+          id,
+        });
       });
     },
     [

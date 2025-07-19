@@ -15,7 +15,7 @@ import { requestInfo } from "rwsdk/worker";
 import { db } from "@/db";
 import { sessions } from "@/session/store";
 
-const getWebAuthnConfig = (request: Request) => {
+const getWebAuthnConfig = ({ request }: { request: Request }) => {
   const rpId = env.WEBAUTHN_RP_ID ?? new URL(request.url).hostname;
   const rpName = IS_DEV ? "Development App" : env.WEBAUTHN_APP_NAME;
   return {
@@ -25,8 +25,11 @@ const getWebAuthnConfig = (request: Request) => {
 };
 
 export const startPasskeyLogin = async () => {
-  const { rpID } = getWebAuthnConfig(requestInfo.request);
-  const { headers } = requestInfo;
+  const { request, headers } = requestInfo;
+
+  const { rpID } = getWebAuthnConfig({
+    request,
+  });
 
   const options = await generateAuthenticationOptions({
     rpID,
@@ -41,7 +44,11 @@ export const startPasskeyLogin = async () => {
   return options;
 };
 
-export const finishPasskeyLogin = async (login: AuthenticationResponseJSON) => {
+export const finishPasskeyLogin = async ({
+  response,
+}: {
+  response: AuthenticationResponseJSON;
+}) => {
   const { request, headers } = requestInfo;
   const { origin } = new URL(request.url);
 
@@ -54,7 +61,7 @@ export const finishPasskeyLogin = async (login: AuthenticationResponseJSON) => {
 
   const credential = await db.credential.findUnique({
     where: {
-      credentialId: login.id,
+      credentialId: response.id,
     },
   });
 
@@ -63,7 +70,7 @@ export const finishPasskeyLogin = async (login: AuthenticationResponseJSON) => {
   }
 
   const verification = await verifyAuthenticationResponse({
-    response: login,
+    response,
     expectedChallenge: challenge,
     expectedOrigin: origin,
     expectedRPID: env.WEBAUTHN_RP_ID || new URL(request.url).hostname,
@@ -81,7 +88,7 @@ export const finishPasskeyLogin = async (login: AuthenticationResponseJSON) => {
 
   await db.credential.update({
     where: {
-      credentialId: login.id,
+      credentialId: response.id,
     },
     data: {
       counter: verification.authenticationInfo.newCounter,
@@ -106,9 +113,16 @@ export const finishPasskeyLogin = async (login: AuthenticationResponseJSON) => {
   return true;
 };
 
-export const startPasskeyRegistration = async (username: string) => {
-  const { rpName, rpID } = getWebAuthnConfig(requestInfo.request);
-  const { headers } = requestInfo;
+export const startPasskeyRegistration = async ({
+  userName,
+}: {
+  userName: string;
+}) => {
+  const { request, headers } = requestInfo;
+
+  const { rpName, rpID } = getWebAuthnConfig({
+    request,
+  });
 
   const verifyTurnstile = await verifyTurnstileToken({
     token: env.TURNSTILE_SITE_KEY,
@@ -121,7 +135,7 @@ export const startPasskeyRegistration = async (username: string) => {
   const options = await generateRegistrationOptions({
     rpName,
     rpID,
-    userName: username,
+    userName,
     authenticatorSelection: {
       residentKey: "required",
       userVerification: "preferred",
@@ -135,10 +149,13 @@ export const startPasskeyRegistration = async (username: string) => {
   return options;
 };
 
-export const finishPasskeyRegistration = async (
-  username: string,
-  registration: RegistrationResponseJSON
-) => {
+export const finishPasskeyRegistration = async ({
+  userName,
+  registration,
+}: {
+  userName: string;
+  registration: RegistrationResponseJSON;
+}) => {
   const { request, headers } = requestInfo;
   const { origin } = new URL(request.url);
 
@@ -163,7 +180,7 @@ export const finishPasskeyRegistration = async (
 
   const user = await db.user.create({
     data: {
-      username,
+      userName,
     },
   });
 

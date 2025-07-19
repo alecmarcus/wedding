@@ -3,41 +3,44 @@
 import { useActionState, useCallback, useState, useTransition } from "react";
 import type { Rsvp } from "@/db";
 import { rsvp } from "./actions";
-import { deleteRsvp, getRsvpByToken } from "./functions";
+import { deleteRsvp, getRsvpByEditToken } from "./functions";
 
-export const useGetRsvpByTokenRequest = () => {
+export const useGetRsvpByEditTokenRequest = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<Rsvp | null>(null);
 
-  const transition = useCallback(async ({ token }: { token: string }) => {
-    try {
-      setError(null);
-      setIsSuccess(false);
-      setData(null);
+  const transition = useCallback(
+    async ({ editToken }: { editToken: string }) => {
+      try {
+        setError(null);
+        setIsSuccess(false);
+        setData(null);
 
-      const result = await getRsvpByToken({
-        token,
-      });
+        const result = await getRsvpByEditToken({
+          editToken,
+        });
 
-      if (!result.isSuccess) {
-        throw new Error(result.error || "Unknown error");
+        if (!result.isSuccess) {
+          throw new Error(result.error || "Unknown error");
+        }
+
+        setIsSuccess(true);
+        setData(result.data);
+      } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : error;
+        setError(`Failed to get RSVP: ${errorMessage}`);
       }
-
-      setIsSuccess(true);
-      setData(result.data);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : error;
-      setError(`Failed to get RSVP: ${errorMessage}`);
-    }
-  }, []);
+    },
+    []
+  );
 
   const request = useCallback(
-    ({ token }: { token: string }) => {
+    ({ editToken }: { editToken: string }) => {
       startTransition(async () => {
         await transition({
-          token,
+          editToken,
         });
       });
     },
@@ -62,12 +65,14 @@ export const useDeleteRsvpRequest = () => {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
-  const transition = useCallback(async (rsvpId: string) => {
+  const transition = useCallback(async ({ id }: { id: string }) => {
     try {
       setError(null);
       setIsSuccess(false);
 
-      const result = await deleteRsvp(rsvpId);
+      const result = await deleteRsvp({
+        id,
+      });
 
       if (!result.isSuccess) {
         throw new Error(result.error);
@@ -82,9 +87,11 @@ export const useDeleteRsvpRequest = () => {
   }, []);
 
   const action = useCallback(
-    ({ rsvpId }: { rsvpId: string }) => {
+    ({ id }: { id: string }) => {
       startTransition(async () => {
-        await transition(rsvpId);
+        await transition({
+          id,
+        });
       });
     },
     [

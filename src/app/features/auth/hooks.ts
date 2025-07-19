@@ -24,10 +24,12 @@ export const useLoginRequest = () => {
       setIsSuccess(false);
 
       const options = await startPasskeyLogin();
-      const authentication = await startAuthentication({
+      const response = await startAuthentication({
         optionsJSON: options,
       });
-      const success = await finishPasskeyLogin(authentication);
+      const success = await finishPasskeyLogin({
+        response,
+      });
 
       if (success) {
         setIsSuccess(true);
@@ -70,12 +72,16 @@ export const useSetupRequest = () => {
       setError(null);
       setIsSuccess(false);
 
-      const options = await startPasskeyRegistration("admin");
+      const options = await startPasskeyRegistration({
+        userName: "admin",
+      });
       const registration = await startRegistration({
         optionsJSON: options,
       });
-
-      const success = await finishPasskeyRegistration("admin", registration);
+      const success = await finishPasskeyRegistration({
+        userName: "admin",
+        registration,
+      });
 
       if (success) {
         setIsSuccess(true);

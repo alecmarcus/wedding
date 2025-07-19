@@ -8,7 +8,7 @@ export const getAllRsvpsWithPhotos = async () => {
       photos: {
         select: {
           id: true,
-          filename: true,
+          fileName: true,
           createdAt: true,
         },
       },
@@ -19,23 +19,23 @@ export const getAllRsvpsWithPhotos = async () => {
   });
 };
 
-export const getRsvpByToken = async ({
-  token,
+export const getRsvpByEditToken = async ({
+  editToken,
 }: {
-  token: string;
+  editToken: string;
 }): Promise<{
   isSuccess: boolean;
   error: string | null;
   data: Rsvp | null;
 }> => {
   try {
-    if (!token) {
-      throw new Error("Invalid token");
+    if (!editToken) {
+      throw new Error("Invalid edit token");
     }
 
     const rsvp = await db.rsvp.findUnique({
       where: {
-        editToken: token,
+        editToken,
       },
     });
 
@@ -79,12 +79,12 @@ export const getRsvpStats = async () => {
   };
 };
 
-export const deleteRsvp = async (rsvpId: string) => {
+export const deleteRsvp = async ({ id }: { id: string }) => {
   try {
     // Photos will be deleted automatically due to cascade delete
     await db.rsvp.delete({
       where: {
-        id: rsvpId,
+        id,
       },
     });
 
