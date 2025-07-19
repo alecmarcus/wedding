@@ -5,11 +5,11 @@ import { useActionState, useCallback, useState, useTransition } from "react";
 import { sendBulkEmail } from "./actions";
 
 export const useResendConfirmationRequest = () => {
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const transition = useCallback(async ({ id }: { id: string }) => {
+  const action = useCallback(async ({ id }: { id: string }) => {
     try {
       setError(null);
       setIsSuccess(false);
@@ -18,7 +18,7 @@ export const useResendConfirmationRequest = () => {
         id,
       });
 
-      if (result.success) {
+      if (result.isSuccess) {
         setIsSuccess(true);
       } else {
         throw new Error(result.error || "Unknown error");
@@ -33,13 +33,13 @@ export const useResendConfirmationRequest = () => {
   const request = useCallback(
     ({ id }: { id: string }) => {
       startTransition(async () => {
-        await transition({
+        await action({
           id,
         });
       });
     },
     [
-      transition,
+      action,
     ]
   );
 
@@ -56,10 +56,10 @@ export const useResendConfirmationRequest = () => {
 export const useBulkEmailAction = (
   initial: Parameters<typeof sendBulkEmail>[0]
 ) => {
-  const [state, request, isPending] = useActionState(sendBulkEmail, initial);
+  const [state, action, isPending] = useActionState(sendBulkEmail, initial);
 
   return [
-    request,
+    action,
     {
       ...state,
       isPending,

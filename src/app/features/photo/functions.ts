@@ -9,8 +9,8 @@ export const getAllPhotos = async () => {
     include: {
       rsvp: {
         select: {
-          name: true,
           email: true,
+          name: true,
         },
       },
     },
@@ -43,13 +43,16 @@ export const deletePhoto = async ({ id }: { id: string }) => {
     });
 
     return {
-      isSuccess: true,
       error: null,
+      isSuccess: true,
     };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
     return {
+      error: errorMessage,
       isSuccess: false,
-      error: error instanceof Error ? error.message : "Unknown error",
     };
   }
 };
@@ -69,9 +72,9 @@ export const getRsvpByUploadToken = async ({
         uploadToken,
       },
       select: {
+        email: true,
         id: true,
         name: true,
-        email: true,
       },
     });
 
@@ -80,15 +83,18 @@ export const getRsvpByUploadToken = async ({
     }
 
     return {
-      isSuccess: true,
       data: rsvp,
       error: null,
+      isSuccess: true,
     };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
     return {
-      isSuccess: false,
-      error: error instanceof Error ? error.message : "Unknown error",
       data: null,
+      error: errorMessage,
+      isSuccess: false,
     };
   }
 };
@@ -104,10 +110,10 @@ export const uploadPhoto = async (uploadToken: string, formData: FormData) => {
 
     // Validate file type
     const allowedTypes = [
+      "image/gif",
       "image/jpeg",
       "image/jpg",
       "image/png",
-      "image/gif",
       "image/webp",
     ];
     if (!allowedTypes.includes(file.type)) {
@@ -125,9 +131,9 @@ export const uploadPhoto = async (uploadToken: string, formData: FormData) => {
         uploadToken,
       },
       select: {
+        email: true,
         id: true,
         name: true,
-        email: true,
       },
     });
 
@@ -151,25 +157,30 @@ export const uploadPhoto = async (uploadToken: string, formData: FormData) => {
     const photo = await db.photo.create({
       data: {
         fileName,
-        uploaderName: rsvp.name,
-        uploaderEmail: rsvp.email,
         rsvpId: rsvp.id,
+        uploaderEmail: rsvp.email,
+        uploaderName: rsvp.name,
       },
     });
 
+    const data = {
+      fileName: photo.fileName,
+      id: photo.id,
+    };
+
     return {
-      isSuccess: true,
+      data,
       error: null,
-      data: {
-        id: photo.id,
-        fileName: photo.fileName,
-      },
+      isSuccess: true,
     };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
     return {
-      isSuccess: false,
-      error: error instanceof Error ? error.message : "Unknown error",
       data: null,
+      error: errorMessage,
+      isSuccess: false,
     };
   }
 };
@@ -203,15 +214,18 @@ export const getPhotosByRsvp = async ({
     });
 
     return {
-      isSuccess: true,
       data: photos,
       error: null,
+      isSuccess: true,
     };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error";
+
     return {
-      isSuccess: false,
-      error: error instanceof Error ? error.message : "Unknown error",
       data: null,
+      error: errorMessage,
+      isSuccess: false,
     };
   }
 };

@@ -7,9 +7,9 @@ export const getAllRsvpsWithPhotos = async () => {
     include: {
       photos: {
         select: {
-          id: true,
-          fileName: true,
           createdAt: true,
+          fileName: true,
+          id: true,
         },
       },
     },
@@ -24,9 +24,9 @@ export const getRsvpByEditToken = async ({
 }: {
   editToken: string;
 }): Promise<{
-  isSuccess: boolean;
-  error: string | null;
   data: Rsvp | null;
+  error: string | null;
+  isSuccess: boolean;
 }> => {
   try {
     if (!editToken) {
@@ -44,18 +44,20 @@ export const getRsvpByEditToken = async ({
     }
 
     return {
-      isSuccess: true,
-      error: null,
       data: rsvp,
+      error: null,
+      isSuccess: true,
     };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : JSON.stringify(error) || "Failed to fetch RSVP.";
+
     return {
-      isSuccess: false,
       data: null,
-      error:
-        error instanceof Error
-          ? error.message
-          : JSON.stringify(error) || "Failed to fetch RSVP.",
+      error: errorMessage,
+      isSuccess: false,
     };
   }
 };
@@ -72,9 +74,9 @@ export const getRsvpStats = async () => {
   const totalGuests = rsvpCount + plusOneCount;
 
   return {
-    rsvpCount,
     photoCount,
     plusOneCount,
+    rsvpCount,
     totalGuests,
   };
 };
@@ -90,14 +92,17 @@ export const deleteRsvp = async ({ id }: { id: string }) => {
 
     return {
       isSuccess: true,
+      error: null,
     };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : JSON.stringify(error) || "Unknown error";
+
     return {
+      error: errorMessage,
       isSuccess: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : JSON.stringify(error) || "Unknown error",
     };
   }
 };

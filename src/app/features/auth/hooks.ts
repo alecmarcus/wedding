@@ -14,11 +14,11 @@ import {
 } from "./functions";
 
 export const useLoginRequest = () => {
+  const [error, setError] = useState<null | string>(null);
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<null | string>(null);
 
-  const transition = useCallback(async () => {
+  const action = useCallback(async () => {
     try {
       setError(null);
       setIsSuccess(false);
@@ -45,11 +45,9 @@ export const useLoginRequest = () => {
   }, []);
 
   const request = useCallback(() => {
-    startTransition(async () => {
-      await transition();
-    });
+    startTransition(action);
   }, [
-    transition,
+    action,
   ]);
 
   return [
@@ -63,11 +61,11 @@ export const useLoginRequest = () => {
 };
 
 export const useSetupRequest = () => {
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const transition = useCallback(async () => {
+  const action = useCallback(async () => {
     try {
       setError(null);
       setIsSuccess(false);
@@ -85,9 +83,7 @@ export const useSetupRequest = () => {
 
       if (success) {
         setIsSuccess(true);
-        const link = document.createElement("a");
-        link.href = "/admin";
-        link.click();
+        navigate("/admin");
       } else {
         throw new Error("Unknown error");
       }
@@ -99,11 +95,9 @@ export const useSetupRequest = () => {
   }, []);
 
   const request = useCallback(() => {
-    startTransition(async () => {
-      await transition();
-    });
+    startTransition(action);
   }, [
-    transition,
+    action,
   ]);
 
   return [

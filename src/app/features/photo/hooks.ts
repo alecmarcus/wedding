@@ -59,9 +59,7 @@ import {
 //   };
 // };
 
-//
-// Convert to action & useActionState
-//
+/** @deprecated Convert to useActionState */
 export const useUploadPhoto = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -128,26 +126,27 @@ export const useUploadPhoto = () => {
 };
 
 export const useGetPhotos = () => {
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isPending, startTransition] = useTransition();
+  const [data, setData] = useState<Photo[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [isPending, startTransition] = useTransition();
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const transition = useCallback(
+  const action = useCallback(
     async ({ uploadToken }: { uploadToken: string | null }) => {
-      setIsSuccess(false);
-
-      if (!uploadToken) {
-        setError("No upload token provided");
-        return;
-      }
-
-      setError(null);
-
       try {
-        const result = await getPhotosByRsvp(uploadToken);
-        if (result.success && result.data) {
-          setPhotos(result.data);
+        setIsSuccess(false);
+        setError(null);
+
+        if (!uploadToken) {
+          throw new Error("No upload token provided");
+        }
+
+        const result = await getPhotosByRsvp({
+          uploadToken,
+        });
+
+        if (result.isSuccess && result.data) {
+          setData(result.data);
         } else {
           throw new Error(result.error || "Failed to load photos");
         }
@@ -160,23 +159,23 @@ export const useGetPhotos = () => {
     []
   );
 
-  const action = useCallback(
+  const request = useCallback(
     ({ uploadToken }: { uploadToken: string | null }) => {
       startTransition(async () => {
-        await transition({
+        await action({
           uploadToken,
         });
       });
     },
     [
-      transition,
+      action,
     ]
   );
 
   return [
-    action,
+    request,
     {
-      data: photos,
+      data,
       error,
       isPending,
       isSuccess,
@@ -185,18 +184,20 @@ export const useGetPhotos = () => {
 };
 
 export const useDeletePhotoRequest = () => {
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  const transition = useCallback(async (photoId: string) => {
+  const action = useCallback(async ({ id }: { id: string }) => {
     try {
       setError(null);
       setIsSuccess(false);
 
-      const result = await deletePhoto(photoId);
+      const result = await deletePhoto({
+        id,
+      });
 
-      if (result.success) {
+      if (result.isSuccess) {
         setIsSuccess(true);
       } else {
         throw new Error(result.error || "Unknown error");
@@ -209,13 +210,15 @@ export const useDeletePhotoRequest = () => {
   }, []);
 
   const request = useCallback(
-    ({ photoId }: { photoId: string }) => {
+    ({ id }: { id: string }) => {
       startTransition(async () => {
-        await transition(photoId);
+        await action({
+          id,
+        });
       });
     },
     [
-      transition,
+      action,
     ]
   );
 

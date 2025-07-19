@@ -34,11 +34,11 @@ export const sendRsvpConfirmationEmail = ({ rsvp }: { rsvp: Rsvp }) => {
   });
 
   return sendEmail({
-    to: rsvp.email,
     bcc: env.FROM_EMAIL,
-    subject: "Wedding RSVP Confirmation",
     html,
+    subject: "Wedding RSVP Confirmation",
     text,
+    to: rsvp.email,
   });
 };
 
@@ -51,10 +51,7 @@ export const resendConfirmationEmail = async ({ id }: { id: string }) => {
     });
 
     if (!rsvp) {
-      return {
-        success: false,
-        error: "RSVP not found",
-      };
+      throw new Error("RSVP not found");
     }
 
     await sendRsvpConfirmationEmail({
@@ -62,16 +59,18 @@ export const resendConfirmationEmail = async ({ id }: { id: string }) => {
     });
 
     return {
-      success: true,
       error: null,
+      isSuccess: true,
     };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : JSON.stringify(error) || "Unknown error";
+
     return {
-      success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : JSON.stringify(error) || "Unknown error",
+      error: errorMessage,
+      isSuccess: false,
     };
   }
 };
@@ -82,11 +81,11 @@ export const sendRsvpExistsEmail = ({ rsvp }: { rsvp: Rsvp }) => {
   });
 
   return sendEmail({
-    to: rsvp.email,
     bcc: env.FROM_EMAIL,
-    subject: "Wedding RSVP Confirmation",
     html,
+    subject: "Wedding RSVP Confirmation",
     text,
+    to: rsvp.email,
   });
 };
 
@@ -96,9 +95,9 @@ export const sendRsvpUpdateEmail = ({ rsvp }: { rsvp: Rsvp }) => {
   });
 
   return sendEmail({
-    to: rsvp.email,
-    subject: "Wedding RSVP Updated",
     html,
+    subject: "Wedding RSVP Updated",
     text,
+    to: rsvp.email,
   });
 };

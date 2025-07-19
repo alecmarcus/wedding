@@ -6,42 +6,46 @@ import { BULK_SEND_FIELDS } from "./fields";
 import { sendEmail } from "./functions";
 
 const bulkEmailSchema = object({
-  subject: pipe(string(), maxLength(BULK_SEND_FIELDS.subject.max)),
   content: pipe(string(), maxLength(BULK_SEND_FIELDS.content.max)),
+  subject: pipe(string(), maxLength(BULK_SEND_FIELDS.subject.max)),
 });
 
-const parseAndValidateFormData = (formData: FormData) => {
+const parseAndValidateFormData = ({ formData }: { formData: FormData }) => {
   const rawData = {
-    subject: formData.get(BULK_SEND_FIELDS.subject.name) as string,
     content: formData.get(BULK_SEND_FIELDS.content.name) as string,
+    subject: formData.get(BULK_SEND_FIELDS.subject.name) as string,
   };
 
   return parse(bulkEmailSchema, rawData);
 };
 
+type FailedEmail = {
+  email: string;
+  error: string | null;
+};
+
 type BulkEmailResponse = {
-  successes: string[];
-  failures: {
-    email: string;
-    error: string | null;
-  }[];
-  total: number;
-  successCount: number;
   failureCount: number;
+  failures: FailedEmail[];
+  successCount: number;
+  successes: string[];
+  total: number;
 };
 
 export type ActionState = {
-  isSuccess: boolean | null;
-  error: string | null;
   data: BulkEmailResponse | null;
+  error: string | null;
+  isSuccess: boolean | null;
 };
 
 export const sendBulkEmail = async (
   _initialState: ActionState,
-  payload: FormData
+  formData: FormData
 ): Promise<ActionState> => {
   try {
-    const { subject, content } = parseAndValidateFormData(payload);
+    const { subject, content } = parseAndValidateFormData({
+      formData,
+    });
 
     const recipients = await db.rsvp.findMany({
       select: {
@@ -62,24 +66,27 @@ export const sendBulkEmail = async (
     const emails = recipients.map(async ({ email }) => {
       try {
         const result = await sendEmail({
-          to: email,
-          subject,
           html,
+          subject,
           text: content.replace(/<[^>]*>/g, ""),
+          to: email,
         });
 
         return {
           data: result,
           error: null,
+          isSuccess: true,
           recipient: email,
-          success: true,
         };
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+
         return {
           data: null,
-          error: error instanceof Error ? error.message : String(error),
+          error: errorMessage,
+          isSuccess: false,
           recipient: email,
-          success: false,
         };
       }
     });
@@ -93,7 +100,7 @@ export const sendBulkEmail = async (
       const recipient = recipients[index];
 
       if (result.status === "fulfilled") {
-        if (result.value.success) {
+        if (result.value.isSuccess) {
           successes.push(recipient.email);
         } else {
           failures.push({
@@ -112,25 +119,26 @@ export const sendBulkEmail = async (
       }
     });
 
+    const data = {
+      failureCount: failures.length,
+      failures,
+      successCount: successes.length,
+      successes,
+      total: recipients.length,
+    };
+
     return {
-      isSuccess: true,
+      data,
       error: null,
-      data: {
-        successes,
-        failures,
-        total: recipients.length,
-        successCount: successes.length,
-        failureCount: failures.length,
-      },
+      isSuccess: true,
     };
   } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
     return {
-      isSuccess: false,
       data: null,
-      error:
-        error instanceof Error
-          ? error.message
-          : JSON.stringify(error) || "Failed to send bulk email",
+      error: errorMessage || "Failed to send bulk email",
+      isSuccess: false,
     };
   }
 };

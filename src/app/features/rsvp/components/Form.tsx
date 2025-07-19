@@ -22,17 +22,17 @@ const RsvpFormSuccess = ({
   const { title, message, confirmationMessage } = useMemo(() => {
     if (submissionType === "update") {
       return {
-        title: "RSVP Updated!",
         message: "Your RSVP has been updated successfully.",
         confirmationMessage:
           "A confirmation email has been sent to your email address.",
+        title: "RSVP Updated!",
       };
     }
     return {
-      title: "Thank You!",
       message: "Your RSVP has been submitted successfully.",
       confirmationMessage:
         "Please check your email for confirmation and important links.",
+      title: "Thank You!",
     };
   }, [
     submissionType,
@@ -138,14 +138,14 @@ export const RsvpForm = ({
         <label htmlFor={nameId}>
           Name *
           <input
-            type="text"
-            id={nameId}
-            name={RSVP_FIELDS.name.name}
-            maxLength={RSVP_FIELDS.name.max}
             defaultValue={rsvp?.name}
-            required={true}
             disabled={isPending}
+            id={nameId}
+            maxLength={RSVP_FIELDS.name.max}
+            name={RSVP_FIELDS.name.name}
             readOnly={submissionType === "update"}
+            required={true}
+            type="text"
           />
         </label>
       </div>
@@ -154,14 +154,14 @@ export const RsvpForm = ({
         <label htmlFor={emailId}>
           Email *
           <input
-            type="email"
-            id={emailId}
-            name={RSVP_FIELDS.email.name}
-            maxLength={RSVP_FIELDS.email.max}
             defaultValue={rsvp?.email}
-            required={true}
             disabled={isPending}
+            id={emailId}
+            maxLength={RSVP_FIELDS.email.max}
+            name={RSVP_FIELDS.email.name}
             readOnly={submissionType === "update"}
+            required={true}
+            type="email"
           />
         </label>
       </div>
@@ -169,13 +169,13 @@ export const RsvpForm = ({
       <div>
         <label htmlFor={plusOneId}>
           <input
-            type="checkbox"
-            id={plusOneId}
-            name={RSVP_FIELDS.plusOne.name}
             checked={hasPlusOne}
             defaultChecked={rsvp?.plusOne}
             disabled={isPending}
+            id={plusOneId}
+            name={RSVP_FIELDS.plusOne.name}
             onChange={handlePlusOneChange}
+            type="checkbox"
           />
           Will you be bringing a plus one?
         </label>
@@ -189,13 +189,13 @@ export const RsvpForm = ({
         <label htmlFor={plusOneNameId}>
           Plus One Name *
           <input
-            type="text"
-            id={plusOneNameId}
-            required={hasPlusOne}
-            name={RSVP_FIELDS.plusOneName.name}
-            maxLength={RSVP_FIELDS.plusOneName.max}
             defaultValue={rsvp?.plusOneName || undefined}
             disabled={isPending}
+            id={plusOneNameId}
+            maxLength={RSVP_FIELDS.plusOneName.max}
+            name={RSVP_FIELDS.plusOneName.name}
+            required={hasPlusOne}
+            type="text"
           />
         </label>
       </div>
@@ -204,12 +204,12 @@ export const RsvpForm = ({
         <label htmlFor={dietaryRestrictionsId}>
           Dietary Restrictions
           <textarea
-            id={dietaryRestrictionsId}
-            name={RSVP_FIELDS.dietaryRestrictions.name}
-            maxLength={RSVP_FIELDS.dietaryRestrictions.max}
-            rows={3}
             defaultValue={rsvp?.dietaryRestrictions || undefined}
             disabled={isPending}
+            id={dietaryRestrictionsId}
+            maxLength={RSVP_FIELDS.dietaryRestrictions.max}
+            name={RSVP_FIELDS.dietaryRestrictions.name}
+            rows={3}
           />
         </label>
       </div>
@@ -218,12 +218,12 @@ export const RsvpForm = ({
         <label htmlFor={messageId}>
           Message for the Couple
           <textarea
-            id={messageId}
-            name={RSVP_FIELDS.message.name}
-            maxLength={RSVP_FIELDS.message.max}
-            rows={4}
             defaultValue={rsvp?.message || undefined}
             disabled={isPending}
+            id={messageId}
+            maxLength={RSVP_FIELDS.message.max}
+            name={RSVP_FIELDS.message.name}
+            rows={4}
           />
         </label>
       </div>

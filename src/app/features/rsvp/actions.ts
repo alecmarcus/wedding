@@ -69,13 +69,15 @@ const createRsvp = async ({
       throw new Error("An RSVP with this email already exists");
     }
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : JSON.stringify(error) || "Unknown error";
+
     return {
-      isSuccess: false,
       data: null,
-      error:
-        error instanceof Error
-          ? error.message
-          : JSON.stringify(error) || "Failed to check for existing RSVP.",
+      error: errorMessage,
+      isSuccess: false,
     };
   }
 
@@ -93,18 +95,20 @@ const createRsvp = async ({
     });
 
     return {
-      isSuccess: true,
-      error: null,
       data: rsvp,
+      error: null,
+      isSuccess: true,
     };
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : JSON.stringify(error) || "Unknown error";
+
     return {
-      isSuccess: false,
       data: null,
-      error:
-        error instanceof Error
-          ? error.message
-          : JSON.stringify(error) || "Failed to submit RSVP.",
+      error: errorMessage,
+      isSuccess: false,
     };
   }
 };
@@ -123,6 +127,8 @@ const updateRsvp = async ({
       },
     });
 
+    // Extra cautious check.
+    // We don't allow editing name and email on the client currently.
     if (existingRsvp) {
       if (email !== existingRsvp.email) {
         const emailExists = await db.rsvp.findFirst({
@@ -154,29 +160,31 @@ const updateRsvp = async ({
       });
 
       return {
-        isSuccess: true,
-        error: null,
         data: updatedRsvp,
+        error: null,
+        isSuccess: true,
       };
     }
 
     throw new Error("RSVP not found");
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : JSON.stringify(error) || "Failed to update RSVP.";
+
     return {
-      isSuccess: false,
       data: null,
-      error:
-        error instanceof Error
-          ? error.message
-          : JSON.stringify(error) || "Failed to update RSVP.",
+      error: errorMessage,
+      isSuccess: false,
     };
   }
 };
 
 export type ActionState = {
-  isSuccess: boolean | null;
-  error: string | null;
   data: Rsvp | null;
+  error: string | null;
+  isSuccess: boolean | null;
 };
 
 export const rsvp = async (
@@ -199,13 +207,15 @@ export const rsvp = async (
 
     return await createRsvp(data);
   } catch (error) {
+    const errorMessage =
+      error instanceof Error
+        ? error.message
+        : JSON.stringify(error) || "Failed to create RSVP.";
+
     return {
-      isSuccess: false,
       data: initialData,
-      error:
-        error instanceof Error
-          ? error.message
-          : JSON.stringify(error) || "Failed to create RSVP.",
+      error: errorMessage,
+      isSuccess: false,
     };
   }
 };
