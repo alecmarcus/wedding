@@ -1,51 +1,66 @@
 "use client";
 
-import { useCallback, useEffect, useState, useTransition } from "react";
-import type { Photo, Rsvp } from "@/db";
-import { getPhotosByRsvp, getRsvpByUploadToken, uploadPhoto } from "./actions";
+import {
+  useCallback,
+  // useEffect,
+  useState,
+  useTransition,
+} from "react";
+import type {
+  Photo,
+  // Rsvp
+} from "@/db";
+import {
+  getPhotosByRsvp,
+  // getRsvpByUploadToken,
+  uploadPhoto,
+} from "./functions";
 
-type RsvpInfo = Pick<Rsvp, "id" | "name" | "email">;
+// type RsvpInfo = Pick<Rsvp, "id" | "name" | "email">;
 
-export const useGetRsvpInfo = (token: string | null) => {
-  const [rsvpInfo, setRsvpInfo] = useState<RsvpInfo | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+// export const useGetRsvpInfo = (token: string | null) => {
+//   const [rsvpInfo, setRsvpInfo] = useState<RsvpInfo | null>(null);
+//   const [isLoading, setIsLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchRsvp = async () => {
-      if (!token) {
-        setError("No token provided");
-        setIsLoading(false);
-        return;
-      }
+//   useEffect(() => {
+//     const fetchRsvp = async () => {
+//       if (!token) {
+//         setError("No token provided");
+//         setIsLoading(false);
+//         return;
+//       }
 
-      try {
-        const result = await getRsvpByUploadToken(token);
-        if (result.success && result.data) {
-          setRsvpInfo(result.data);
-          setError(null);
-        } else {
-          setError(result.error || "Failed to verify upload token");
-        }
-      } catch {
-        setError("Failed to verify upload token");
-      } finally {
-        setIsLoading(false);
-      }
-    };
+//       try {
+//         const result = await getRsvpByUploadToken(token);
+//         if (result.success && result.data) {
+//           setRsvpInfo(result.data);
+//           setError(null);
+//         } else {
+//           setError(result.error || "Failed to verify upload token");
+//         }
+//       } catch {
+//         setError("Failed to verify upload token");
+//       } finally {
+//         setIsLoading(false);
+//       }
+//     };
 
-    void fetchRsvp();
-  }, [
-    token,
-  ]);
+//     void fetchRsvp();
+//   }, [
+//     token,
+//   ]);
 
-  return {
-    rsvpInfo,
-    isLoading,
-    error,
-  };
-};
+//   return {
+//     rsvpInfo,
+//     isLoading,
+//     error,
+//   };
+// };
 
+//
+// Convert to action & useActionState
+//
 export const useUploadPhoto = () => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -111,46 +126,59 @@ export const useUploadPhoto = () => {
   ] as const;
 };
 
-export const useGetPhotos = (uploadToken: string | null) => {
-  const [photos, setPhotos] = useState<Photo[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export const useGetPhotos = () => {
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [photos, setPhotos] = useState<Photo[]>([]);
 
-  const fetchPhotos = useCallback(async () => {
-    if (!uploadToken) {
-      setError("No token provided");
-      setIsLoading(false);
-      return;
-    }
+  const transition = useCallback(
+    async ({ uploadToken }: { uploadToken: string | null }) => {
+      setIsSuccess(false);
 
-    try {
-      setIsLoading(true);
-      const result = await getPhotosByRsvp(uploadToken);
-      if (result.success && result.data) {
-        setPhotos(result.data);
-        setError(null);
-      } else {
-        setError(result.error || "Failed to load photos");
+      if (!uploadToken) {
+        setError("No token provided");
+        return;
       }
-    } catch (err) {
-      setError("Failed to load photos");
-    } finally {
-      setIsLoading(false);
-    }
-  }, [
-    uploadToken,
-  ]);
 
-  useEffect(() => {
-    void fetchPhotos();
-  }, [
-    fetchPhotos,
-  ]);
+      setError(null);
 
-  return {
-    photos,
-    isLoading,
-    error,
-    refetch: fetchPhotos,
-  };
+      try {
+        const result = await getPhotosByRsvp(uploadToken);
+        if (result.success && result.data) {
+          setPhotos(result.data);
+        } else {
+          throw new Error(result.error || "Failed to load photos");
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : JSON.stringify(error);
+        setError(`Failed to load photos: ${errorMessage}`);
+      }
+    },
+    []
+  );
+
+  const action = useCallback(
+    ({ uploadToken }: { uploadToken: string | null }) => {
+      startTransition(async () => {
+        await transition({
+          uploadToken,
+        });
+      });
+    },
+    [
+      transition,
+    ]
+  );
+
+  return [
+    action,
+    {
+      data: photos,
+      error,
+      isPending,
+      isSuccess,
+    },
+  ] as const;
 };

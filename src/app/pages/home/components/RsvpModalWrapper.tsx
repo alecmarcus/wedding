@@ -1,47 +1,50 @@
 "use client";
 
 import { Link } from "@@/components/Link";
-import { getRsvpByEditToken } from "@@/pages/home/actions";
+import { RsvpForm } from "@@/features/rsvp/Form";
+import { getRsvpByEditToken } from "@@/features/rsvp/functions";
 import { Suspense, useCallback, useEffect, useState } from "react";
 import type { Rsvp } from "@/db";
-import { RsvpForm } from "./RsvpForm";
 
-const useSearchParams = () => {
-  const [searchParams, setSearchParams] = useState<URLSearchParams>(
-    new URLSearchParams()
-  );
+const getSearchParams = () => {
+  if (typeof window === "undefined") {
+    return new URLSearchParams();
+  }
 
-  useEffect(() => {
-    setSearchParams(new URLSearchParams(window.location.search));
-  }, []);
-
-  return searchParams;
+  return new URLSearchParams(window.location.search);
 };
 
 const RsvpModal = () => {
-  const searchParams = useSearchParams();
+  const searchParams = getSearchParams();
   const showRsvp = searchParams.has("rsvp");
   const token = searchParams.get("token");
+
   const [rsvp, setRsvp] = useState<Rsvp | null>(null);
   const [isLoading, setIsLoading] = useState(!!token);
   const [error, setError] = useState<string | null>(null);
 
   const fetchRsvp = useCallback(async () => {
+    setError(null);
+    setIsLoading(false);
+
     if (!token) {
-      setIsLoading(false);
       return;
     }
 
     try {
       const result = await getRsvpByEditToken(token);
-      if (result.success && result.data) {
+      if (result.isSuccess && result.data) {
+        console.log(result.data);
         setRsvp(result.data);
-        setError(null);
       } else {
-        setError(result.error || "Failed to load RSVP");
+        throw new Error(result.error || "Unknown error");
       }
-    } catch {
-      setError("Failed to load RSVP");
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : JSON.stringify(error) || "Unknown error";
+      setError(`Failed to load RSVP: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
@@ -58,11 +61,6 @@ const RsvpModal = () => {
   if (!showRsvp) {
     return null;
   }
-
-  const handleSuccess = () => {
-    // Remove query params after successful submission
-    window.history.replaceState({}, "", window.location.pathname);
-  };
 
   if (isLoading) {
     return (
@@ -82,15 +80,7 @@ const RsvpModal = () => {
     );
   }
 
-  return (
-    <div>
-      <RsvpForm
-        rsvp={rsvp || undefined}
-        editToken={token || undefined}
-        onSuccess={handleSuccess}
-      />
-    </div>
-  );
+  return <RsvpForm rsvp={rsvp} />;
 };
 
 export const RsvpModalWrapper = () => {

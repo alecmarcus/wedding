@@ -3,7 +3,10 @@
 import { PhotoItem } from "@@/components/PhotoItem";
 import { useEffect, useState } from "react";
 import type { Photo } from "@/db";
-import { useGetPhotos, useGetRsvpInfo } from "./hooks";
+import {
+  useGetPhotos,
+  // useGetRsvpInfo
+} from "./hooks";
 import { UploadForm } from "./UploadForm";
 
 const PhotoList = ({ photos }: { photos: Photo[] }) => {
@@ -38,53 +41,54 @@ export const UploadPage = () => {
     setToken(tokenParam);
   }, []);
 
-  const {
-    rsvpInfo,
-    isLoading: isLoadingRsvp,
-    error: rsvpError,
-  } = useGetRsvpInfo(token);
-  const {
-    photos,
-    isLoading: isLoadingPhotos,
-    error: photosError,
-  } = useGetPhotos(token);
+  return "Wip";
+  // const {
+  //   rsvpInfo,
+  //   isLoading: isLoadingRsvp,
+  //   error: rsvpError,
+  // } = useGetRsvpInfo(token);
+  // const {
+  //   photos,
+  //   isLoading: isLoadingPhotos,
+  //   error: photosError,
+  // } = useGetPhotos(token);
 
-  if (isLoadingRsvp) {
-    return (
-      <div>
-        <h1>Loading...</h1>
-      </div>
-    );
-  }
+  // if (isLoadingRsvp) {
+  //   return (
+  //     <div>
+  //       <h1>Loading...</h1>
+  //     </div>
+  //   );
+  // }
 
-  if (rsvpError || !rsvpInfo || !token) {
-    return (
-      <div>
-        <h1>Upload Photos</h1>
-        <p>Please RSVP first before uploading photos.</p>
-        <p>
-          {rsvpError ||
-            "Invalid or expired link. Please check your email for the correct upload link."}
-        </p>
-        <a href="/">Go to RSVP</a>
-      </div>
-    );
-  }
+  // if (rsvpError || !rsvpInfo || !token) {
+  //   return (
+  //     <div>
+  //       <h1>Upload Photos</h1>
+  //       <p>Please RSVP first before uploading photos.</p>
+  //       <p>
+  //         {rsvpError ||
+  //           "Invalid or expired link. Please check your email for the correct upload link."}
+  //       </p>
+  //       <a href="/">Go to RSVP</a>
+  //     </div>
+  //   );
+  // }
 
-  return (
-    <div>
-      <h1>Upload Wedding Photos</h1>
-      <p>Welcome, {rsvpInfo.name}!</p>
+  // return (
+  //   <div>
+  //     <h1>Upload Wedding Photos</h1>
+  //     <p>Welcome, {rsvpInfo.name}!</p>
 
-      <UploadForm uploadToken={token} />
+  //     <UploadForm uploadToken={token} />
 
-      {isLoadingPhotos ? (
-        <p>Loading your photos...</p>
-      ) : photosError ? (
-        <p>Error loading photos: {photosError}</p>
-      ) : (
-        <PhotoList photos={photos} />
-      )}
-    </div>
-  );
+  //     {isLoadingPhotos ? (
+  //       <p>Loading your photos...</p>
+  //     ) : photosError ? (
+  //       <p>Error loading photos: {photosError}</p>
+  //     ) : (
+  //       <PhotoList photos={photos} />
+  //     )}
+  //   </div>
+  // );
 };

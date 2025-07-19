@@ -5,13 +5,13 @@ import { useId, useRef, useState } from "react";
 import { useSendBulkEmail } from "../email/hooks";
 
 const BulkEmailForm = () => {
-  const formRef = useRef<HTMLFormElement>(null);
+  const ref = useRef<HTMLFormElement>(null);
   const [subject, setSubject] = useState("");
   const [content, setContent] = useState("");
   const subjectId = useId();
   const contentId = useId();
 
-  const [sendBulkEmail, { isPending, isSuccess, error, result, reset }] =
+  const [sendBulkEmail, { isPending, isSuccess, error, data, reset }] =
     useSendBulkEmail();
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -23,19 +23,33 @@ const BulkEmailForm = () => {
   };
 
   const handleReset = () => {
-    formRef.current?.reset();
+    ref.current?.reset();
     setSubject("");
     setContent("");
     reset();
   };
 
-  if (isSuccess && result) {
+  if (isSuccess && data) {
     return (
       <div>
-        <h3>Email Sent Successfully!</h3>
-        <p>Total emails sent: {result.totalSent}</p>
-        <p>Successful: {result.successCount}</p>
-        {result.failureCount > 0 && <p>Failed: {result.failureCount}</p>}
+        <h3>
+          {data.successCount === data.total ? "All" : data.successCount} Sent
+        </h3>
+        {data.failureCount > 0 && (
+          <>
+            <h4>{data.failureCount} Failed</h4>
+            <ul>
+              {data.failures.map(({ email, error }) => (
+                <li key={email}>
+                  <details>
+                    <summary>{email}</summary>
+                    {error}
+                  </details>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
         <button type="button" onClick={handleReset}>
           Send Another Email
         </button>
@@ -44,7 +58,7 @@ const BulkEmailForm = () => {
   }
 
   return (
-    <form ref={formRef} onSubmit={handleSubmit}>
+    <form ref={ref} onSubmit={handleSubmit}>
       <h3>Send Bulk Email to All Guests</h3>
 
       {error && (
@@ -91,12 +105,11 @@ const BulkEmailForm = () => {
   );
 };
 
-export const AdminActions = () => {
+export const Actions = () => {
   const [showBulkEmail, setShowBulkEmail] = useState(false);
 
   return (
-    <div>
-      <h2>Actions</h2>
+    <>
       <button type="button" onClick={() => setShowBulkEmail(!showBulkEmail)}>
         {showBulkEmail ? "Hide Bulk Email Form" : "Send Bulk Email"}
       </button>
@@ -105,6 +118,6 @@ export const AdminActions = () => {
           <BulkEmailForm />
         </div>
       )}
-    </div>
+    </>
   );
 };

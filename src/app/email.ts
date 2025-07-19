@@ -1,23 +1,18 @@
 "use server";
 
 import { env } from "cloudflare:workers";
-import { Resend } from "resend";
+import { type CreateEmailOptions, Resend } from "resend";
 import type { Rsvp } from "@/db";
+import type { DistributiveOmit } from "~/types";
 
-export const sendEmail = async (options: {
-  to: string;
-  subject: string;
-  html: string;
-  text?: string;
-}) => {
-  const resend = new Resend(env.RESEND_API);
+export const resend = new Resend(env.RESEND_API);
 
+export const sendEmail = async (
+  options: DistributiveOmit<CreateEmailOptions, "from">
+) => {
   const { data, error } = await resend.emails.send({
     from: env.FROM_EMAIL,
-    to: options.to,
-    subject: options.subject,
-    html: options.html,
-    text: options.text,
+    ...options,
   });
 
   if (error) {
@@ -29,7 +24,7 @@ export const sendEmail = async (options: {
 };
 
 export const sendRsvpConfirmationEmail = (rsvp: Rsvp, baseUrl: string) => {
-  const editLink = `${baseUrl}/rsvp/edit?token=${rsvp.editToken}`;
+  const editLink = `${baseUrl}/?rsvp&token=${rsvp.editToken}`;
   const uploadLink = `${baseUrl}/upload?token=${rsvp.uploadToken}`;
 
   const html = `
@@ -80,6 +75,36 @@ We look forward to celebrating with you!
 
   return sendEmail({
     to: rsvp.email,
+    bcc: env.FROM_EMAIL,
+    subject: "Wedding RSVP Confirmation",
+    html,
+    text,
+  });
+};
+
+export const sendRsvpExistsEmail = (rsvp: Rsvp, baseUrl: string) => {
+  const editLink = `${baseUrl}/?rsvp&token=${rsvp.editToken}`;
+  const uploadLink = `${baseUrl}/upload?token=${rsvp.uploadToken}`;
+
+  const html = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      An RSVP was submitted with this email, but we already have an existing one. If you want to make changes, use the link below.
+      <ul>
+        <li><a href="${editLink}">Edit your RSVP</a></li>
+        <li><a href="${uploadLink}">Upload photos for the wedding</a></li>
+      </ul>
+    </div>
+  `;
+
+  const text = `
+An RSVP was submitted with this email, but we already have an existing one. If you want to make changes, use the link below.
+- Edit your RSVP: ${editLink}
+- Upload photos: ${uploadLink}
+  `;
+
+  return sendEmail({
+    to: rsvp.email,
+    bcc: env.FROM_EMAIL,
     subject: "Wedding RSVP Confirmation",
     html,
     text,
@@ -87,7 +112,7 @@ We look forward to celebrating with you!
 };
 
 export const sendRsvpUpdateEmail = (rsvp: Rsvp, baseUrl: string) => {
-  const editLink = `${baseUrl}/rsvp/edit?token=${rsvp.editToken}`;
+  const editLink = `${baseUrl}/?rsvp&token=${rsvp.editToken}`;
   const uploadLink = `${baseUrl}/upload?token=${rsvp.uploadToken}`;
 
   const html = `
@@ -137,7 +162,7 @@ We look forward to celebrating with you!
     subject: "Wedding RSVP Updated",
     html,
     text,
-  });
+  }).then(r => console.log("sent update email", r));
 };
 
 export const sendBulkEmail = async (
@@ -150,28 +175,64 @@ export const sendBulkEmail = async (
       ${content}
     </div>
   `;
-  return await Promise.allSettled(
-    recipients.map(recipient => async () => {
-      try {
-        const result = await sendEmail({
-          to: recipient,
-          subject,
-          html,
-          text: content.replace(/<[^>]*>/g, ""),
+  const emails = recipients.map(async recipient => {
+    try {
+      const result = await sendEmail({
+        to: recipient,
+        subject,
+        html,
+        text: content.replace(/<[^>]*>/g, ""),
+      });
+      return {
+        recipient,
+        success: true,
+        data: result,
+      };
+    } catch (error) {
+      return {
+        recipient,
+        success: false,
+        data: null,
+        error: error instanceof Error ? error.message : String(error),
+      };
+    }
+  });
+
+  const results = await Promise.allSettled(emails);
+
+  const successes: string[] = [];
+  const failures: {
+    email: string;
+    error?: string;
+  }[] = [];
+  results.forEach((result, index) => {
+    const recipient = recipients[index];
+
+    if (result.status === "fulfilled") {
+      if (result.value.success) {
+        successes.push(recipient);
+      } else {
+        failures.push({
+          email: recipient,
+          error: result.value.error,
         });
-        return {
-          recipient,
-          success: true,
-          data: result,
-        };
-      } catch (error) {
-        return {
-          recipient,
-          success: false,
-          data: null,
-          error,
-        };
       }
-    })
-  );
+    } else {
+      failures.push({
+        email: recipient,
+        error:
+          result.reason instanceof Error
+            ? result.reason.message
+            : String(result.reason),
+      });
+    }
+  });
+
+  return {
+    successes,
+    failures,
+    total: recipients.length,
+    successCount: successes.length,
+    failureCount: failures.length,
+  };
 };

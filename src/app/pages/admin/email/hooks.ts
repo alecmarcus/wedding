@@ -3,30 +3,25 @@ import { resendConfirmationEmail, sendBulkEmailToGuests } from "./functions";
 
 export const useResendConfirmation = () => {
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const transition = useCallback(async (rsvpId: string) => {
     try {
       setError(null);
       setIsSuccess(false);
+
       const result = await resendConfirmationEmail(rsvpId);
 
       if (result.success) {
         setIsSuccess(true);
       } else {
-        setError(result.error || "Failed to resend email");
+        throw new Error(result.error || "Unknown error");
       }
-
-      return result;
-    } catch (err) {
+    } catch (error) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to resend email";
-      setError(errorMessage);
-      return {
-        success: false,
-        error: errorMessage,
-      };
+        error instanceof Error ? error.message : JSON.stringify(error);
+      setError(`Failed to resend email: ${errorMessage}`);
     }
   }, []);
 
@@ -41,18 +36,12 @@ export const useResendConfirmation = () => {
     ]
   );
 
-  const reset = useCallback(() => {
-    setIsSuccess(false);
-    setError(null);
-  }, []);
-
   return [
     action,
     {
-      isPending,
       error,
+      isPending,
       isSuccess,
-      reset,
     },
   ] as const;
 };
@@ -61,40 +50,38 @@ export const useSendBulkEmail = () => {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
-  const [result, setResult] = useState<{
-    totalSent: number;
-    successCount: number;
-    failureCount: number;
-  } | null>(null);
+  const [data, setData] =
+    useState<Awaited<ReturnType<typeof sendBulkEmailToGuests>>["data"]>(null);
 
-  const transition = useCallback(async (subject: string, content: string) => {
-    try {
-      setError(null);
-      setIsSuccess(false);
-      const response = await sendBulkEmailToGuests(subject, content);
-
-      if (response.success && response.data) {
-        setIsSuccess(true);
-        setResult({
-          totalSent: response.data.totalSent,
-          successCount: response.data.successCount,
-          failureCount: response.data.failureCount,
-        });
-      } else {
-        setError(response.error || "Failed to send bulk email");
-      }
-
-      return response;
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : "Failed to send bulk email";
-      setError(errorMessage);
-      return {
-        success: false,
-        error: errorMessage,
-      };
-    }
+  const reset = useCallback(() => {
+    setIsSuccess(false);
+    setError(null);
+    setData(null);
   }, []);
+
+  const transition = useCallback(
+    async (subject: string, content: string) => {
+      try {
+        reset();
+
+        const response = await sendBulkEmailToGuests(subject, content);
+
+        if (response.success && response.data) {
+          setIsSuccess(true);
+          setData(response.data);
+        } else {
+          throw new Error(response.error || "Unknown error");
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : JSON.stringify(error);
+        setError(`"Failed to send bulk email": ${errorMessage}`);
+      }
+    },
+    [
+      reset,
+    ]
+  );
 
   const action = useCallback(
     ({ subject, content }: { subject: string; content: string }) => {
@@ -107,19 +94,13 @@ export const useSendBulkEmail = () => {
     ]
   );
 
-  const reset = useCallback(() => {
-    setIsSuccess(false);
-    setError(null);
-    setResult(null);
-  }, []);
-
   return [
     action,
     {
-      isPending,
+      data,
       error,
+      isPending,
       isSuccess,
-      result,
       reset,
     },
   ] as const;

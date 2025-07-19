@@ -6,7 +6,6 @@ import {
   startRegistration,
 } from "@simplewebauthn/browser";
 import { useCallback, useState, useTransition } from "react";
-import { IS_DEV } from "rwsdk/constants";
 import {
   finishPasskeyLogin,
   finishPasskeyRegistration,
@@ -15,12 +14,15 @@ import {
 } from "./functions";
 
 export const useLoginAction = () => {
-  const [isSuccess, setIsSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
-  const [isError, setIsError] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<null | string>(null);
 
   const transition = useCallback(async () => {
     try {
+      setError(null);
+      setIsSuccess(false);
+
       const options = await startPasskeyLogin();
       const authentication = await startAuthentication({
         optionsJSON: options,
@@ -28,17 +30,15 @@ export const useLoginAction = () => {
       const success = await finishPasskeyLogin(authentication);
 
       if (success) {
+        setIsSuccess(true);
         navigate("/admin");
       } else {
-        IS_DEV && console.log("Login failed");
+        throw new Error("Unknown error");
       }
     } catch (error) {
-      setIsSuccess(false);
-      setIsError(true);
-      IS_DEV &&
-        console.log(
-          `Login failed: ${error instanceof Error ? error.message : JSON.stringify(error)}`
-        );
+      setError(
+        `Login failed: ${error instanceof Error ? error.message : JSON.stringify(error)}`
+      );
     }
   }, []);
 
@@ -53,7 +53,7 @@ export const useLoginAction = () => {
   return [
     action,
     {
-      isError,
+      error,
       isPending,
       isSuccess,
     },
@@ -61,16 +61,20 @@ export const useLoginAction = () => {
 };
 
 export const useSetupAction = () => {
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [isError, setIsError] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const transition = useCallback(async () => {
     try {
+      setError(null);
+      setIsSuccess(false);
+
       const options = await startPasskeyRegistration("admin");
       const registration = await startRegistration({
         optionsJSON: options,
       });
+
       const success = await finishPasskeyRegistration("admin", registration);
 
       if (success) {
@@ -78,14 +82,13 @@ export const useSetupAction = () => {
         const link = document.createElement("a");
         link.href = "/admin";
         link.click();
+      } else {
+        throw new Error("Unknown error");
       }
     } catch (error) {
-      setIsSuccess(false);
-      setIsError(true);
-      IS_DEV &&
-        console.log(
-          `Setup failed: ${error instanceof Error ? error.message : JSON.stringify(error)}`
-        );
+      setError(
+        `Setup failed: ${error instanceof Error ? error.message : JSON.stringify(error)}`
+      );
     }
   }, []);
 
@@ -100,7 +103,7 @@ export const useSetupAction = () => {
   return [
     action,
     {
-      isError,
+      error,
       isPending,
       isSuccess,
     },

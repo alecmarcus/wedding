@@ -9,7 +9,10 @@
   "files": {
     "ignoreUnknown": true,
     "includes": [
-      "./**",
+      "./**/*.ts",
+      "./**/*.tsx",
+      "./**/*.js",
+      "./**/*.jsx",
       "!bun.lock",
       "!rws.d.ts",
       "!rwsdk.d.ts",
@@ -28,7 +31,10 @@
   },
   "formatter": {
     "includes": [
-      "./**",
+      "./**/*.ts",
+      "./**/*.tsx",
+      "./**/*.js",
+      "./**/*.jsx",
       "!bun.lock",
       "!rws.d.ts",
       "!rwsdk.d.ts",
@@ -43,7 +49,10 @@
   },
   "linter": {
     "includes": [
-      "./**",
+      "./**/*.ts",
+      "./**/*.tsx",
+      "./**/*.js",
+      "./**/*.jsx",
       "!bun.lock",
       "!rws.d.ts",
       "!rwsdk.d.ts",

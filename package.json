@@ -38,7 +38,8 @@
     "react": "^19.1.0",
     "react-server-dom-webpack": "19.2.0-canary-39cad7af-20250411",
     "resend": "^4.6.0",
-    "rwsdk": "0.1.14"
+    "rwsdk": "0.1.14",
+    "valibot": "^1.1.0"
   },
   "devDependencies": {
     "@biomejs/biome": "2.1.1",

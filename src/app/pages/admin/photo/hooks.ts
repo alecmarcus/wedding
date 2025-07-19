@@ -3,26 +3,25 @@ import { deletePhoto } from "./functions";
 
 export const useDeletePhoto = () => {
   const [isPending, startTransition] = useTransition();
+  const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const transition = useCallback(async (photoId: string) => {
     try {
       setError(null);
+      setIsSuccess(false);
+
       const result = await deletePhoto(photoId);
 
-      if (!result.success) {
-        setError(result.error || "Failed to delete photo");
+      if (result.success) {
+        setIsSuccess(true);
+      } else {
+        throw new Error(result.error || "Unknown error");
       }
-
-      return result;
-    } catch (err) {
+    } catch (error) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete photo";
-      setError(errorMessage);
-      return {
-        success: false,
-        error: errorMessage,
-      };
+        error instanceof Error ? error.message : JSON.stringify(error);
+      setError(`Failed to delete photo: ${errorMessage}`);
     }
   }, []);
 
@@ -40,8 +39,9 @@ export const useDeletePhoto = () => {
   return [
     action,
     {
-      isPending,
       error,
+      isPending,
+      isSuccess,
     },
   ] as const;
 };

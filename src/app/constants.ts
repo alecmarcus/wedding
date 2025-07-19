@@ -1,6 +1,42 @@
 const ONE_MB = 1024 ^ 2;
 const mb = (amount: number) => amount * ONE_MB;
 
+const MIN_REQ = 1;
+const MAX_NAME = 75;
+const MAX_DIET = 500;
+const MAX_MESSAGE = 1000;
+
+export const RSVP_FIELDS = {
+  name: {
+    name: "name",
+    min: MIN_REQ,
+    max: MAX_NAME,
+  },
+  email: {
+    name: "email",
+    max: MAX_NAME,
+  },
+  plusOne: {
+    name: "plusOne",
+    max: MAX_NAME,
+  },
+  plusOneName: {
+    name: "plusOneName",
+    min: MIN_REQ,
+    max: MAX_NAME,
+  },
+  dietaryRestrictions: {
+    name: "dietaryRestrictions",
+    min: 0,
+    max: MAX_DIET,
+  },
+  message: {
+    name: "message",
+    min: 0,
+    max: MAX_MESSAGE,
+  },
+} as const;
+
 export const MAX_FILE_SIZE = mb(10);
 export const MAX_PHOTOS_PER_RSVP = 50;
 export const ALLOWED_IMAGE_TYPES = [
@@ -24,15 +60,6 @@ export const SUCCESS = {
   RSVP_UPDATED: "Your RSVP has been updated successfully.",
   PHOTO_UPLOADED: "Photo uploaded successfully!",
   EMAIL_SENT: "Email sent successfully!",
-} as const;
-
-export const RSVP_FORM_FIELDS = {
-  NAME: "name",
-  EMAIL: "email",
-  PLUS_ONE: "plusOne",
-  PLUS_ONE_NAME: "plusOneName",
-  DIETARY_RESTRICTIONS: "dietaryRestrictions",
-  MESSAGE: "message",
 } as const;
 
 export const UPLOAD_FORM_FIELDS = {
