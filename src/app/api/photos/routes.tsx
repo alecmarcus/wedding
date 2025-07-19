@@ -1,41 +1,33 @@
+import { env } from "cloudflare:workers";
 import { route } from "rwsdk/router";
+import type { RequestInfo } from "rwsdk/worker";
+
+export type PhotosApiRequest = RequestInfo<{
+  filename: string;
+}>;
 
 export const photoRoutes = [
-  route(
-    "/:filename",
-    (
-      // { params }
-    ) => {
-      // const { filename } = params;
+  route<PhotosApiRequest>("/:filename", async ({ params: { filename } }) => {
+    try {
+      const object = await env.PHOTOS.get(filename);
 
-      // TODO: Implement actual photo retrieval from R2 or other storage service
-      // For now, return a placeholder response
+      if (!object) {
+        return new Response("Photo not found", {
+          status: 404,
+        });
+      }
 
-      // Example implementation once storage is set up:
-      // const { env } = requestInfo;
-      // try {
-      //   const object = await env.BUCKET.get(filename);
-      //   if (!object) {
-      //     return new Response("Photo not found", { status: 404 });
-      //   }
-      //
-      //   const headers = new Headers();
-      //   object.writeHttpMetadata(headers);
-      //   headers.set("Cache-Control", "public, max-age=31536000");
-      //
-      //   return new Response(object.body, { headers });
-      // } catch (error) {
-      //   console.error("Failed to retrieve photo:", error);
-      //   return new Response("Failed to retrieve photo", { status: 500 });
-      // }
+      const headers = new Headers();
+      object.writeHttpMetadata(headers);
+      headers.set("Cache-Control", "public, max-age=31536000");
 
-      // Placeholder response for now
-      return new Response("Photo storage not yet implemented", {
-        status: 501,
-        headers: {
-          "Content-Type": "text/plain",
-        },
+      return new Response(object.body, {
+        headers,
+      });
+    } catch (error) {
+      return new Response(JSON.stringify(error), {
+        status: 500,
       });
     }
-  ),
+  }),
 ];
