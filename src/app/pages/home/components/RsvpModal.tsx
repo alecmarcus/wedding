@@ -1,52 +1,49 @@
-"use client";
-
-import { Link } from "@@/components/Link";
 import { RsvpForm } from "@@/features/rsvp/components/Form";
-import { useGetRsvpByEditTokenRequest } from "@@/features/rsvp/hooks";
-import { useEffect, useState } from "react";
+import { Suspense } from "react";
+import { Link } from "@/app/components/Link";
+import { getRsvpByEditToken } from "@/app/features/rsvp/functions";
+import type { Rsvp } from "@/db";
 
-export const RsvpModal = () => {
-  const [getRsvpByEditToken, { isPending, data: rsvp, error }] =
-    useGetRsvpByEditTokenRequest();
+export const RsvpModal = async ({ token }: { token?: string }) => {
+  let rsvp: Rsvp | null = null;
+  let error: string | null = null;
 
-  const [searchParams, setSearchParams] = useState<URLSearchParams>();
-  const showRsvp = !!searchParams?.has("rsvp");
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setSearchParams(params);
-
-    const editToken = params?.get("token");
-    if (typeof editToken === "string") {
-      getRsvpByEditToken({
-        editToken,
-      });
+  if (token) {
+    const result = await getRsvpByEditToken({
+      editToken: token,
+    });
+    if (result.error) {
+      error = result.error;
+    } else {
+      rsvp = result.data;
     }
-  }, [
-    getRsvpByEditToken,
-  ]);
-
-  if (!showRsvp) {
-    return null;
   }
 
-  if (isPending) {
-    return (
-      <div>
-        <h2>Loading RSVP...</h2>
+  return (
+    <Suspense fallback="Loading RSVP...">
+      <Link
+        to="/"
+        style={{
+          inset: 0,
+          position: "absolute",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(0, 0, 0, 0.5)",
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          padding: 30,
+          backgroundColor: "white",
+        }}
+      >
+        <RsvpForm rsvp={rsvp} error={error} />
       </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div>
-        <h2>Error</h2>
-        <p>{error}</p>
-        <Link to="/">Back to Home</Link>
-      </div>
-    );
-  }
-
-  return <RsvpForm rsvp={rsvp} />;
+    </Suspense>
+  );
 };

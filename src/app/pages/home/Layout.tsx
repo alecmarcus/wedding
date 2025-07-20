@@ -1,14 +1,14 @@
 import { Link } from "@@/components/Link";
 import { getAllPhotos } from "@@/features/photo/functions";
 import { PhotoGallery } from "@@/pages/home/components/PhotoGallery";
-import { RsvpModal } from "@@/pages/home/components/RsvpModal";
+import type { LayoutProps } from "rwsdk/router";
 
 const PhotoSection = async () => {
   const photos = await getAllPhotos();
   return <PhotoGallery photos={photos} />;
 };
 
-export const Home = () => {
+export const HomeLayout = ({ children }: LayoutProps) => {
   return (
     <div>
       <h1>Soyeon & Alec</h1>
@@ -21,17 +21,11 @@ export const Home = () => {
         <p>Location: [Wedding Venue]</p>
       </div>
 
-      <div>
-        <a href="/?rsvp">RSVP Now</a>
-      </div>
+      <Link to="/rsvp">RSVP</Link>
 
-      <RsvpModal />
+      {children}
 
       <PhotoSection />
-
-      <div>
-        <Link to="/admin">Admin</Link>
-      </div>
     </div>
   );
 };

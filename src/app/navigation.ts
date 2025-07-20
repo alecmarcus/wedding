@@ -3,9 +3,13 @@ import { defineLinks } from "rwsdk/router";
 export const link = defineLinks([
   "/",
   "/admin",
-  "/admin/setup",
   "/admin/login",
   "/admin/logout",
+  "/admin/setup",
+  "/api/photos/:fileName",
+  "/rsvp",
+  "/rsvp/:token",
+  "/upload",
 ]);
 
 export type Href = Parameters<typeof link>;

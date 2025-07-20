@@ -1,5 +1,5 @@
 import { RESPONSE_STATUS } from "@@/constants";
-import { type RouteDefinition, route } from "rwsdk/router";
+import { prefix, route } from "rwsdk/router";
 import { db } from "@/db";
 import { sessions } from "@/session/store";
 import { Admin } from ".";
@@ -11,7 +11,7 @@ const isSetupNeeded = async () => {
   return userCount === 0;
 };
 
-const setup: RouteDefinition = route("/setup", [
+const setup = route("/setup", [
   async () => {
     if (!(await isSetupNeeded())) {
       return new Response(null, {
@@ -25,7 +25,7 @@ const setup: RouteDefinition = route("/setup", [
   Setup,
 ]);
 
-const login: RouteDefinition = route("/login", [
+const login = route("/login", [
   async ({ ctx }) => {
     if (await isSetupNeeded()) {
       return new Response(null, {
@@ -47,7 +47,7 @@ const login: RouteDefinition = route("/login", [
   Login,
 ]);
 
-const logout: RouteDefinition = route("/logout", [
+const logout = route("/logout", [
   async ({ request, headers }) => {
     await sessions.remove(request, headers);
     return new Response(null, {
@@ -59,7 +59,7 @@ const logout: RouteDefinition = route("/logout", [
   },
 ]);
 
-const index: RouteDefinition = route("/", [
+const index = route("/", [
   async ({ ctx: { user } }) => {
     if (await isSetupNeeded()) {
       return new Response(null, {
@@ -81,9 +81,9 @@ const index: RouteDefinition = route("/", [
   Admin,
 ]);
 
-export const adminRoutes = [
-  setup,
-  login,
+export const adminRoutes = prefix("/admin", [
   index,
+  login,
   logout,
-];
+  setup,
+]);

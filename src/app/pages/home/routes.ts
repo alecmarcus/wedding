@@ -1,6 +1,11 @@
-import { route } from "rwsdk/router";
-import { Home } from "./Home";
+import { layout, route } from "rwsdk/router";
+import { Home } from ".";
+import { HomeLayout } from "./Layout";
+import { rsvpRoutes } from "./rsvp/routes";
 
-export const homeRoutes = [
-  route("/", Home),
-];
+const index = route("/", Home);
+
+export const homeRoutes = layout(HomeLayout, [
+  index,
+  rsvpRoutes,
+]);

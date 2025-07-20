@@ -13,5 +13,6 @@ export default defineScript(async () => {
     DELETE FROM Photo;
   `);
 
+  // biome-ignore lint/suspicious/noConsole: script output
   console.log("Database cleared. Visit /admin/setup to create admin account.");
 });

@@ -11,8 +11,8 @@ const createEmailEditLinks = ({
   const { request } = requestInfo;
   const { origin } = new URL(request.url);
 
-  const editLink = `${origin}/?rsvp&token=${editToken}`;
-  const uploadLink = `${origin}/upload?token=${uploadToken}`;
+  const editLink = `${origin}/rsvp/${editToken}`;
+  const uploadLink = `${origin}/upload/${uploadToken}`;
 
   return {
     editLink,

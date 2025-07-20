@@ -1,11 +1,7 @@
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+"use client";
+
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { sec } from "@/app/constants";
 import type { Rsvp } from "@/db";
 import { RSVP_FIELDS } from "../fields";
 import { useRsvpAction } from "../hooks";
@@ -52,21 +48,16 @@ const RsvpFormSuccess = ({
 
 export const RsvpForm = ({
   rsvp: initialRsvp,
+  error: initialError,
   onDoneEditing,
-  onCancelUpdating,
+  // onCancelUpdating,
 }: {
   rsvp: Rsvp | null;
   onDoneEditing?: () => void;
-  onCancelUpdating?: () => void;
+  // onCancelUpdating?: () => void;
+  error: string | null;
 }) => {
   const ref = useRef<HTMLFormElement>(null);
-
-  const nameId = useId();
-  const emailId = useId();
-  const plusOneId = useId();
-  const plusOneNameId = useId();
-  const dietaryRestrictionsId = useId();
-  const messageId = useId();
 
   const [rsvpAction, { isSuccess, isPending, error, data: rsvp }] =
     useRsvpAction({
@@ -79,10 +70,27 @@ export const RsvpForm = ({
   const [submissionType, setSubmissionType] = useState<
     RsvpFormSuccessProps["submissionType"]
   >(initialRsvp ? "update" : "create");
+
+  const [shownError, setShownError] = useState<string | null>(null);
+  useEffect(() => {
+    if (error || initialError) {
+      setShownError(error || initialError);
+      const timeout = setTimeout(() => {
+        setShownError(null);
+      }, sec(3));
+
+      return () => clearTimeout(timeout);
+    }
+  }, [
+    error,
+    initialError,
+  ]);
+
   const returnToEditing = useCallback(() => {
     setIsEditing(true);
     setSubmissionType("update");
   }, []);
+
   useEffect(() => {
     if (isPending === false && isSuccess) {
       setIsEditing(false);
@@ -128,19 +136,20 @@ export const RsvpForm = ({
     <form ref={ref} action={rsvpAction}>
       <h2>{title}</h2>
 
-      {error && (
+      {shownError && (
         <div role="alert">
-          <p>{error}</p>
+          <p>{shownError}</p>
         </div>
       )}
 
       <div>
-        <label htmlFor={nameId}>
+        <label htmlFor={RSVP_FIELDS.name.name}>
           Name *
           <input
+            autoComplete="name"
             defaultValue={rsvp?.name}
             disabled={isPending}
-            id={nameId}
+            id={RSVP_FIELDS.name.name}
             maxLength={RSVP_FIELDS.name.max}
             name={RSVP_FIELDS.name.name}
             readOnly={submissionType === "update"}
@@ -151,12 +160,13 @@ export const RsvpForm = ({
       </div>
 
       <div>
-        <label htmlFor={emailId}>
+        <label htmlFor={RSVP_FIELDS.email.name}>
           Email *
           <input
+            autoComplete="email"
             defaultValue={rsvp?.email}
             disabled={isPending}
-            id={emailId}
+            id={RSVP_FIELDS.email.name}
             maxLength={RSVP_FIELDS.email.max}
             name={RSVP_FIELDS.email.name}
             readOnly={submissionType === "update"}
@@ -167,12 +177,12 @@ export const RsvpForm = ({
       </div>
 
       <div>
-        <label htmlFor={plusOneId}>
+        <label htmlFor={RSVP_FIELDS.plusOne.name}>
           <input
             checked={hasPlusOne}
             defaultChecked={rsvp?.plusOne}
             disabled={isPending}
-            id={plusOneId}
+            id={RSVP_FIELDS.plusOne.name}
             name={RSVP_FIELDS.plusOne.name}
             onChange={handlePlusOneChange}
             type="checkbox"
@@ -186,12 +196,13 @@ export const RsvpForm = ({
           display: hasPlusOne ? "block" : "none",
         }}
       >
-        <label htmlFor={plusOneNameId}>
+        <label htmlFor={RSVP_FIELDS.plusOneName.name}>
           Plus One Name *
           <input
+            autoComplete="name"
             defaultValue={rsvp?.plusOneName || undefined}
             disabled={isPending}
-            id={plusOneNameId}
+            id={RSVP_FIELDS.plusOneName.name}
             maxLength={RSVP_FIELDS.plusOneName.max}
             name={RSVP_FIELDS.plusOneName.name}
             required={hasPlusOne}
@@ -201,12 +212,12 @@ export const RsvpForm = ({
       </div>
 
       <div>
-        <label htmlFor={dietaryRestrictionsId}>
+        <label htmlFor={RSVP_FIELDS.dietaryRestrictions.name}>
           Dietary Restrictions
           <textarea
             defaultValue={rsvp?.dietaryRestrictions || undefined}
             disabled={isPending}
-            id={dietaryRestrictionsId}
+            id={RSVP_FIELDS.dietaryRestrictions.name}
             maxLength={RSVP_FIELDS.dietaryRestrictions.max}
             name={RSVP_FIELDS.dietaryRestrictions.name}
             rows={3}
@@ -215,12 +226,12 @@ export const RsvpForm = ({
       </div>
 
       <div>
-        <label htmlFor={messageId}>
+        <label htmlFor={RSVP_FIELDS.message.name}>
           Message for the Couple
           <textarea
             defaultValue={rsvp?.message || undefined}
             disabled={isPending}
-            id={messageId}
+            id={RSVP_FIELDS.message.name}
             maxLength={RSVP_FIELDS.message.max}
             name={RSVP_FIELDS.message.name}
             rows={4}
@@ -228,11 +239,11 @@ export const RsvpForm = ({
         </label>
       </div>
 
-      {onCancelUpdating && submissionType === "update" && (
+      {/* {onCancelUpdating && submissionType === "update" && (
         <button type="button" disabled={isPending} onClick={onCancelUpdating}>
           Cancel
         </button>
-      )}
+      )} */}
       <button type="submit" disabled={isPending}>
         {buttonText}
       </button>
