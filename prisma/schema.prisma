@@ -64,7 +64,7 @@ model Rsvp {
 
 model Photo {
   id            String   @id @default(uuid())
-  fileName      String
+  fileName      String   @unique
   uploaderName  String?
   uploaderEmail String?
   rsvpId        String? // Link to RSVP
@@ -72,6 +72,7 @@ model Photo {
   createdAt     DateTime @default(now())
 
   @@index([createdAt])
-  @@index([uploaderName])
+  @@index([fileName])
   @@index([rsvpId])
+  @@index([uploaderName])
 }

@@ -76,8 +76,10 @@ CREATE INDEX "Rsvp_uploadToken_idx" ON "Rsvp"("uploadToken");
 CREATE INDEX "Photo_createdAt_idx" ON "Photo"("createdAt");
 
 -- CreateIndex
+CREATE INDEX "Photo_fileName_idx" ON "Photo"("fileName");
+
+-- CreateIndex
 CREATE INDEX "Photo_uploaderName_idx" ON "Photo"("uploaderName");
 
 -- CreateIndex
 CREATE INDEX "Photo_rsvpId_idx" ON "Photo"("rsvpId");
-

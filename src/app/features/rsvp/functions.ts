@@ -95,10 +95,7 @@ export const deleteRsvp = async ({ id }: { id: string }) => {
       error: null,
     };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : JSON.stringify(error) || "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : String(error);
 
     return {
       error: errorMessage,

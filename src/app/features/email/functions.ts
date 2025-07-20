@@ -63,10 +63,7 @@ export const resendConfirmationEmail = async ({ id }: { id: string }) => {
       isSuccess: true,
     };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : JSON.stringify(error) || "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : String(error);
 
     return {
       error: errorMessage,

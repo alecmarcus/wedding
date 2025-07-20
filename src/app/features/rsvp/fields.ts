@@ -1,3 +1,5 @@
+import { PHOTO_UPLOAD_FIELDS } from "../photo/fields";
+
 const MAX_NAME = 75;
 const MAX_DIET = 500;
 const MAX_MESSAGE = 1000;
@@ -26,4 +28,5 @@ export const RSVP_FIELDS = {
     name: "message",
     max: MAX_MESSAGE,
   },
+  ...PHOTO_UPLOAD_FIELDS,
 } as const;

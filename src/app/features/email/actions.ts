@@ -109,12 +109,14 @@ export const sendBulkEmail = async (
           });
         }
       } else {
+        const errorMessage =
+          result.reason instanceof Error
+            ? result.reason.message
+            : String(result.reason);
+
         failures.push({
           email: recipient.email,
-          error:
-            result.reason instanceof Error
-              ? result.reason.message
-              : String(result.reason),
+          error: errorMessage,
         });
       }
     });
@@ -137,7 +139,7 @@ export const sendBulkEmail = async (
 
     return {
       data: null,
-      error: errorMessage || "Failed to send bulk email",
+      error: errorMessage,
       isSuccess: false,
     };
   }

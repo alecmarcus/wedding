@@ -1,6 +1,6 @@
 "use client";
 
-import { UPLOAD_PHOTO_FIELDS } from "@@/features/photo/fields";
+import { PHOTO_UPLOAD_FIELDS } from "@@/features/photo/fields";
 import { useUploadPhoto } from "@@/features/photo/hooks";
 import { useRef } from "react";
 
@@ -48,11 +48,11 @@ export const UploadForm = ({ uploadToken }: UploadFormProps) => {
       )}
 
       <div>
-        <label htmlFor={UPLOAD_PHOTO_FIELDS.photo.name}>Select Photo *</label>
+        <label htmlFor={PHOTO_UPLOAD_FIELDS.photo.name}>Select Photo *</label>
         <input
           type="file"
-          id={UPLOAD_PHOTO_FIELDS.photo.name}
-          name={UPLOAD_PHOTO_FIELDS.photo.name}
+          id={PHOTO_UPLOAD_FIELDS.photo.name}
+          name={PHOTO_UPLOAD_FIELDS.photo.name}
           accept="image/*"
           required={true}
           disabled={isPending}

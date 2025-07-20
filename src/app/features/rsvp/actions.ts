@@ -17,6 +17,10 @@ import {
 } from "valibot";
 import { db, type Rsvp } from "@/db";
 import { RSVP_FIELDS } from "./fields";
+import {
+  type ActionState as UploadPhotosActionState,
+  uploadPhotos,
+} from "./photo/actions";
 
 const rsvpSchema = object({
   name: pipe(string(), maxLength(RSVP_FIELDS.name.max)),
@@ -43,6 +47,7 @@ const parseAndValidateFormData = (formData: FormData) => {
       | string
       | null,
     message: formData.get(RSVP_FIELDS.message.name) as string | null,
+    photos: formData.getAll(RSVP_FIELDS.photos.name) as File[],
   };
 
   return parse(rsvpSchema, rawData);
@@ -50,11 +55,17 @@ const parseAndValidateFormData = (formData: FormData) => {
 
 type ParsedFormData = ReturnType<typeof parseAndValidateFormData>;
 
+type RsvpActionState = {
+  data: Rsvp | null;
+  error: string | null;
+  isSuccess: boolean | null;
+};
+
 const createRsvp = async ({
   name,
   email,
   ...data
-}: ParsedFormData): Promise<ActionState> => {
+}: Omit<ParsedFormData, "photos">): Promise<RsvpActionState> => {
   try {
     const existingRsvp = await db.rsvp.findFirst({
       where: {
@@ -69,10 +80,7 @@ const createRsvp = async ({
       throw new Error("An RSVP with this email already exists");
     }
   } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : JSON.stringify(error) || "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : String(error);
 
     return {
       data: null,
@@ -100,10 +108,7 @@ const createRsvp = async ({
       isSuccess: true,
     };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : JSON.stringify(error) || "Unknown error";
+    const errorMessage = error instanceof Error ? error.message : String(error);
 
     return {
       data: null,
@@ -119,7 +124,7 @@ const updateRsvp = async ({
   ...data
 }: {
   editToken: string;
-} & ParsedFormData): Promise<ActionState> => {
+} & Omit<ParsedFormData, "photos">): Promise<RsvpActionState> => {
   try {
     const existingRsvp = await db.rsvp.findUnique({
       where: {
@@ -182,7 +187,11 @@ const updateRsvp = async ({
 };
 
 export type ActionState = {
-  data: Rsvp | null;
+  data:
+    | (Rsvp & {
+        photos: UploadPhotosActionState["data"];
+      })
+    | null;
   error: string | null;
   isSuccess: boolean | null;
 };
@@ -199,13 +208,56 @@ export const rsvp = async (
     }
 
     if (initialData?.editToken) {
-      return await updateRsvp({
+      const uploadResult = await uploadPhotos(
+        {
+          data: null,
+          editToken: initialData.editToken,
+          error: null,
+          isSuccess: null,
+        },
+        payload
+      );
+
+      const { data: rsvpData, ...state } = await updateRsvp({
         ...data,
         editToken: initialData.editToken,
       });
+
+      return {
+        ...state,
+        data: rsvpData
+          ? {
+              ...rsvpData,
+              photos: uploadResult.data,
+            }
+          : null,
+      };
     }
 
-    return await createRsvp(data);
+    const { data: rsvpData, ...state } = await createRsvp(data);
+    let uploadResult: UploadPhotosActionState | null = null;
+
+    if (rsvpData?.editToken) {
+      uploadResult = await uploadPhotos(
+        {
+          data: null,
+          editToken: rsvpData?.editToken,
+          error: null,
+          isSuccess: null,
+        },
+        payload
+      );
+    }
+
+    return {
+      ...state,
+      data: rsvpData
+        ? {
+            ...rsvpData,
+            photos: uploadResult ? uploadResult.data : null,
+          }
+        : null,
+    };
   } catch (error) {
     const errorMessage =
       error instanceof Error
