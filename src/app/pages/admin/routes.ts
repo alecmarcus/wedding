@@ -1,4 +1,4 @@
-import { RESPONSE_STATUS } from "@@/constants";
+import { STATUS } from "@@/constants";
 import { prefix, route } from "rwsdk/router";
 import { db } from "@/db";
 import { sessions } from "@/session/store";
@@ -15,7 +15,7 @@ const setup = route("/setup", [
   async () => {
     if (!(await isSetupNeeded())) {
       return new Response(null, {
-        status: RESPONSE_STATUS.Found302.code,
+        status: STATUS.Found302.code,
         headers: {
           Location: "/admin/login",
         },
@@ -29,7 +29,7 @@ const login = route("/login", [
   async ({ ctx }) => {
     if (await isSetupNeeded()) {
       return new Response(null, {
-        status: RESPONSE_STATUS.Found302.code,
+        status: STATUS.Found302.code,
         headers: {
           Location: "/admin/setup",
         },
@@ -37,7 +37,7 @@ const login = route("/login", [
     }
     if (ctx.user) {
       return new Response(null, {
-        status: RESPONSE_STATUS.Found302.code,
+        status: STATUS.Found302.code,
         headers: {
           Location: "/admin",
         },
@@ -51,7 +51,7 @@ const logout = route("/logout", [
   async ({ request, headers }) => {
     await sessions.remove(request, headers);
     return new Response(null, {
-      status: RESPONSE_STATUS.Found302.code,
+      status: STATUS.Found302.code,
       headers: {
         Location: "/",
       },
@@ -63,7 +63,7 @@ const index = route("/", [
   async ({ ctx: { user } }) => {
     if (await isSetupNeeded()) {
       return new Response(null, {
-        status: RESPONSE_STATUS.Found302.code,
+        status: STATUS.Found302.code,
         headers: {
           Location: "/admin/setup",
         },
@@ -71,7 +71,7 @@ const index = route("/", [
     }
     if (!user) {
       return new Response(null, {
-        status: RESPONSE_STATUS.Found302.code,
+        status: STATUS.Found302.code,
         headers: {
           Location: "/admin/login",
         },

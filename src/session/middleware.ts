@@ -1,4 +1,4 @@
-import { RESPONSE_STATUS } from "@@/constants";
+import { STATUS } from "@@/constants";
 import { env } from "cloudflare:workers";
 import type { RouteMiddleware } from "rwsdk/router";
 import { ErrorResponse } from "rwsdk/worker";
@@ -20,15 +20,15 @@ export const sessionMiddleware: RouteMiddleware = async ({
       error instanceof ErrorResponse &&
       (
         [
-          RESPONSE_STATUS.Forbidden403.code,
-          RESPONSE_STATUS.Unauthorized401.code,
+          STATUS.Forbidden403.code,
+          STATUS.Unauthorized401.code,
         ] as number[]
       ).includes(error.code)
     ) {
       await sessions.remove(request, headers);
       headers.set("Location", "/");
       return new Response(null, {
-        status: RESPONSE_STATUS.Found302.code,
+        status: STATUS.Found302.code,
         headers,
       });
     }

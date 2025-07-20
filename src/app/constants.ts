@@ -4,7 +4,7 @@ const ONE_S = 1000;
 export const mib = (mebibytes: number) => mebibytes * ONE_MiB;
 export const sec = (seconds: number) => seconds * ONE_S;
 
-export const RESPONSE_STATUS = {
+export const STATUS = {
   Ok200: {
     message: "OK",
     code: 200,

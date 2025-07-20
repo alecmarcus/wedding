@@ -1,6 +1,7 @@
 import { env } from "cloudflare:workers";
 import { route } from "rwsdk/router";
 import type { RequestInfo } from "rwsdk/worker";
+import { STATUS } from "@/app/constants";
 
 export type PhotosFileNameRequest = RequestInfo<{
   fileName: string;
@@ -15,7 +16,7 @@ export const photosRoutes = route("/api/photos/:fileName", async request => {
 
     if (!object) {
       return new Response("Photo not found", {
-        status: 404,
+        status: STATUS.NotFound404.code,
       });
     }
 
@@ -28,7 +29,7 @@ export const photosRoutes = route("/api/photos/:fileName", async request => {
     });
   } catch (error) {
     return new Response(JSON.stringify(error), {
-      status: 500,
+      status: STATUS.InternalServerError500.code,
     });
   }
 });
