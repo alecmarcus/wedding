@@ -10,7 +10,9 @@ export const link = defineLinks([
   "/photos/:token",
   "/rsvp",
   "/rsvp/:token",
-  "/upload",
+  "/upload/:token",
+  "/upload/admin",
+  "/upload/login",
 ]);
 
 export type Href = Parameters<typeof link>;

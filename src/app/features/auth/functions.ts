@@ -202,3 +202,8 @@ export const finishPasskeyRegistration = async ({
 
   return true;
 };
+
+export const isSetupNeeded = async () => {
+  const userCount = await db.user.count();
+  return userCount === 0;
+};

@@ -1,5 +1,5 @@
 import { Login as LoginComponent } from "@@/components/Login";
 
 export const Login = () => (
-  <LoginComponent automatic={true} redirect="/admin" />
+  <LoginComponent automatic={true} redirect="/upload/admin" />
 );

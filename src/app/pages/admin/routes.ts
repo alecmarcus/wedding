@@ -1,15 +1,10 @@
 import { STATUS } from "@@/constants";
 import { prefix, route } from "rwsdk/router";
-import { db } from "@/db";
+import { isSetupNeeded } from "@/app/features/auth/functions";
 import { sessions } from "@/session/store";
 import { Admin } from ".";
 import { Login } from "./login";
 import { Setup } from "./setup";
-
-const isSetupNeeded = async () => {
-  const userCount = await db.user.count();
-  return userCount === 0;
-};
 
 const setup = route("/setup", [
   async () => {
@@ -26,7 +21,7 @@ const setup = route("/setup", [
 ]);
 
 const login = route("/login", [
-  async ({ ctx }) => {
+  async ({ ctx: { user } }) => {
     if (await isSetupNeeded()) {
       return new Response(null, {
         status: STATUS.Found302.code,
@@ -35,7 +30,8 @@ const login = route("/login", [
         },
       });
     }
-    if (ctx.user) {
+
+    if (user) {
       return new Response(null, {
         status: STATUS.Found302.code,
         headers: {

@@ -1,6 +1,6 @@
 "use client";
 
-import { navigate } from "@@/navigation";
+import { type Href, navigate } from "@@/navigation";
 import {
   startAuthentication,
   startRegistration,
@@ -13,7 +13,11 @@ import {
   startPasskeyRegistration,
 } from "./functions";
 
-export const useLoginRequest = () => {
+export const useLoginRequest = ({
+  redirect,
+}: {
+  redirect?: Href | Href[0];
+} = {}) => {
   const [error, setError] = useState<null | string>(null);
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
@@ -33,7 +37,15 @@ export const useLoginRequest = () => {
 
       if (success) {
         setIsSuccess(true);
-        navigate("/admin");
+        if (redirect) {
+          navigate(
+            ...((Array.isArray(redirect)
+              ? redirect
+              : [
+                  redirect,
+                ]) as Href)
+          );
+        }
       } else {
         throw new Error("Unknown error");
       }
@@ -42,7 +54,9 @@ export const useLoginRequest = () => {
         `Login failed: ${error instanceof Error ? error.message : JSON.stringify(error)}`
       );
     }
-  }, []);
+  }, [
+    redirect,
+  ]);
 
   const request = useCallback(() => {
     startTransition(action);
