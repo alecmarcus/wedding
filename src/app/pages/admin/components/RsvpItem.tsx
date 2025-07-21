@@ -99,10 +99,10 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
   const [deletePhoto, { isPending: isDeletingPhoto }] = useDeletePhotoRequest();
 
   const handleDeletePhoto = useCallback(
-    (photoId: string) => {
+    ({ id }: { id: string }) => {
       if (window.confirm("Are you sure you want to delete this photo?")) {
         deletePhoto({
-          photoId,
+          id,
         });
       }
     },
