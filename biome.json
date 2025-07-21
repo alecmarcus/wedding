@@ -9,16 +9,20 @@
   "files": {
     "ignoreUnknown": true,
     "includes": [
-      "./**/*.ts",
-      "./**/*.tsx",
       "./**/*.js",
       "./**/*.jsx",
+      "./**/*.ts",
+      "./**/*.tsx",
+      "!**/.wrangler/**",
+      "!**/dist/**",
+      "!**/generated/**",
+      "!**/node_modules/**",
+      "!./generated/**",
       "!bun.lock",
       "!rws.d.ts",
       "!rwsdk.d.ts",
       "!vite.d.ts",
-      "!worker-configuration.d.ts",
-      "!./generated/**"
+      "!worker-configuration.d.ts"
     ]
   },
   "assist": {
@@ -31,16 +35,20 @@
   },
   "formatter": {
     "includes": [
-      "./**/*.ts",
-      "./**/*.tsx",
       "./**/*.js",
       "./**/*.jsx",
+      "./**/*.ts",
+      "./**/*.tsx",
+      "!**/.wrangler/**",
+      "!**/dist/**",
+      "!**/generated/**",
+      "!**/node_modules/**",
+      "!./generated/**",
       "!bun.lock",
       "!rws.d.ts",
       "!rwsdk.d.ts",
       "!vite.d.ts",
-      "!worker-configuration.d.ts",
-      "!./generated/**"
+      "!worker-configuration.d.ts"
     ],
     "enabled": true,
     "indentStyle": "space",
@@ -49,16 +57,20 @@
   },
   "linter": {
     "includes": [
-      "./**/*.ts",
-      "./**/*.tsx",
       "./**/*.js",
       "./**/*.jsx",
+      "./**/*.ts",
+      "./**/*.tsx",
+      "!**/.wrangler/**",
+      "!**/dist/**",
+      "!**/generated/**",
+      "!**/node_modules/**",
+      "!./generated/**",
       "!bun.lock",
       "!rws.d.ts",
       "!rwsdk.d.ts",
       "!vite.d.ts",
-      "!worker-configuration.d.ts",
-      "!./generated/**"
+      "!worker-configuration.d.ts"
     ],
     "enabled": true,
     "rules": {
@@ -103,7 +115,20 @@
   "overrides": [
     {
       "includes": [
-        "**"
+        "./**/*.js",
+        "./**/*.jsx",
+        "./**/*.ts",
+        "./**/*.tsx",
+        "!**/.wrangler/**",
+        "!**/dist/**",
+        "!**/generated/**",
+        "!**/node_modules/**",
+        "!./generated/**",
+        "!bun.lock",
+        "!rws.d.ts",
+        "!rwsdk.d.ts",
+        "!vite.d.ts",
+        "!worker-configuration.d.ts"
       ],
       "linter": {
         "rules": {
