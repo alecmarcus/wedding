@@ -80,11 +80,11 @@ export const RsvpForm = ({
   rsvp: initialRsvp,
   error: initialError,
   onDoneEditing,
-  // onCancelUpdating,
+  onCancelUpdating,
 }: {
   rsvp: ActionState["data"];
   onDoneEditing?: () => void;
-  // onCancelUpdating?: () => void;
+  onCancelUpdating?: () => void;
   error: string | null;
 }) => {
   const ref = useRef<HTMLFormElement>(null);
@@ -415,11 +415,11 @@ export const RsvpForm = ({
         </label>
       </div>
 
-      {/* {onCancelUpdating && submissionType === "update" && (
+      {onCancelUpdating && submissionType === "update" && (
         <button type="button" disabled={isPending} onClick={onCancelUpdating}>
           Cancel
         </button>
-      )} */}
+      )}
       <button
         type="submit"
         disabled={isPending || aFileIsTooLarge || tooManyFiles}

@@ -10,6 +10,47 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { link } from "@/app/navigation";
 import type { Photo, Rsvp } from "@/db";
 
+const PhotoItem = ({
+  id,
+  fileName,
+  createdAt,
+  uploaderName,
+}: Pick<Photo, "id" | "fileName" | "createdAt" | "uploaderName">) => {
+  const [deletePhoto, { isPending: isDeletingPhoto }] = useDeletePhotoRequest();
+
+  const handleDeletePhoto = useCallback(() => {
+    if (window.confirm("Are you sure you want to delete this photo?")) {
+      deletePhoto({
+        id,
+      });
+    }
+  }, [
+    deletePhoto,
+    id,
+  ]);
+
+  return (
+    <div key={id}>
+      <Image
+        src={link("/photo/:fileName", {
+          fileName,
+        })}
+        alt={`Uploaded by ${uploaderName}`}
+      />
+      <p>
+        Uploaded on {new Date(createdAt).toLocaleDateString()} by {uploaderName}
+      </p>
+      <button
+        type="button"
+        onClick={handleDeletePhoto}
+        disabled={isDeletingPhoto}
+      >
+        {isDeletingPhoto ? "Deleting..." : "Delete Photo"}
+      </button>
+    </div>
+  );
+};
+
 export const RsvpItem = ({
   rsvp,
   photos,
@@ -18,11 +59,8 @@ export const RsvpItem = ({
   photos: Photo[] | null;
 }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const startEditing = useCallback(() => {
-    setIsEditing(true);
-  }, []);
-  const stopEditing = useCallback(() => {
-    setIsEditing(false);
+  const toggleIsEditing = useCallback(() => {
+    setIsEditing(e => !e);
   }, []);
 
   const [
@@ -98,20 +136,6 @@ export const RsvpItem = ({
   ]);
 
   const [showPhotos, setShowPhotos] = useState(false);
-  const [deletePhoto, { isPending: isDeletingPhoto }] = useDeletePhotoRequest();
-
-  const handleDeletePhoto = useCallback(
-    ({ id }: { id: string }) => {
-      if (window.confirm("Are you sure you want to delete this photo?")) {
-        deletePhoto({
-          id,
-        });
-      }
-    },
-    [
-      deletePhoto,
-    ]
-  );
 
   const guestCount = rsvp.plusOne ? 2 : 1;
 
@@ -134,7 +158,7 @@ export const RsvpItem = ({
         {photos && <p>Photos Uploaded: {photos.length}</p>}
 
         <div>
-          <button type="button" onClick={startEditing} disabled={isEditing}>
+          <button type="button" onClick={toggleIsEditing} disabled={isEditing}>
             Edit
           </button>
           <button
@@ -174,35 +198,22 @@ export const RsvpItem = ({
                 }
               : null,
           }}
-          onDoneEditing={stopEditing}
+          onDoneEditing={toggleIsEditing}
           error={null}
-          // onCancelUpdating={stopEditing}
+          onCancelUpdating={toggleIsEditing}
         />
       )}
 
       {showPhotos && photos && (
         <div>
-          {photos.map(({ id, fileName, createdAt }) => (
-            <div key={id}>
-              <Image
-                src={link("/photo/:fileName", {
-                  fileName,
-                })}
-                alt={`Uploaded by ${rsvp.name}`}
-              />
-              <p>Uploaded: {new Date(createdAt).toLocaleDateString()}</p>
-              <button
-                type="button"
-                onClick={() =>
-                  handleDeletePhoto({
-                    id,
-                  })
-                }
-                disabled={isDeletingPhoto}
-              >
-                {isDeletingPhoto ? "Deleting..." : "Delete Photo"}
-              </button>
-            </div>
+          {photos.map(({ id, fileName, createdAt, uploaderName }) => (
+            <PhotoItem
+              key={id}
+              id={id}
+              fileName={fileName}
+              createdAt={createdAt}
+              uploaderName={uploaderName}
+            />
           ))}
         </div>
       )}
