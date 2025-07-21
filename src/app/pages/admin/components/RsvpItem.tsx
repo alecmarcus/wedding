@@ -155,7 +155,7 @@ export const RsvpItem = ({
         )}
         {rsvp.message && <p>Message: {rsvp.message}</p>}
         <p>RSVP Date: {new Date(rsvp.createdAt).toLocaleDateString()}</p>
-        {photos && <p>Photos Uploaded: {photos.length}</p>}
+        {photos && photos.length > 0 && <p>Photos Uploaded: {photos.length}</p>}
 
         <div>
           <button type="button" onClick={toggleIsEditing} disabled={isEditing}>
@@ -176,7 +176,7 @@ export const RsvpItem = ({
             {isResendPending ? "Sending..." : "Resend Confirmation"}
           </button>
           {resendConfirmationText}
-          {photos && (
+          {photos && photos.length > 0 && (
             <button type="button" onClick={() => setShowPhotos(show => !show)}>
               {showPhotos ? "Hide Photos" : "View Photos"}
             </button>
@@ -204,7 +204,7 @@ export const RsvpItem = ({
         />
       )}
 
-      {showPhotos && photos && (
+      {showPhotos && photos && photos.length > 0 && (
         <div>
           {photos.map(({ id, fileName, createdAt, uploaderName }) => (
             <PhotoItem

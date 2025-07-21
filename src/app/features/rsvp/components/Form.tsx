@@ -142,10 +142,12 @@ export const RsvpForm = ({
   );
 
   const buttonText = useMemo(() => {
-    if (isPending) {
-      return submissionType === "update" ? "Updating..." : "Submitting...";
-    }
-    return submissionType === "update" ? "Update RSVP" : "Submit RSVP";
+    const pendingText =
+      submissionType === "update" ? "Updating..." : "Submitting...";
+    const actionText =
+      submissionType === "update" ? "Update RSVP" : "Submit RSVP";
+
+    return isPending ? pendingText : actionText;
   }, [
     isPending,
     submissionType,
@@ -191,7 +193,7 @@ export const RsvpForm = ({
     ...selectedPhotos,
   ];
   const tooManyFiles = allPhotos.length > RSVP_FIELDS.photos.maxLength;
-  const aFileIsTooLarge = allPhotos.some(
+  const someFileIsTooLarge = allPhotos.some(
     ({ size }) => size && size > RSVP_FIELDS.photos.maxSize
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -206,7 +208,6 @@ export const RsvpForm = ({
       for (const file of files) {
         selected.push({
           src: URL.createObjectURL(file),
-          // src: file.webkitRelativePath,
           size: getFileSize(file.size).mib,
           name: file.name,
           id: null,
@@ -229,34 +230,34 @@ export const RsvpForm = ({
   const removePhoto = useCallback(
     ({ name, id }: { name: string | null; id: string | null }) => {
       if (id) {
-        removeExistingPhoto({
+        return removeExistingPhoto({
           id,
         });
-      } else {
-        const input = fileInputRef.current;
+      }
 
-        if (name && input?.files) {
-          const remaining = new DataTransfer();
-          for (const existingFile of input.files) {
-            if (name !== existingFile.name) {
-              remaining.items.add(existingFile);
-            }
+      const input = fileInputRef.current;
+
+      if (name && input?.files) {
+        const remaining = new DataTransfer();
+        for (const existingFile of input.files) {
+          if (name !== existingFile.name) {
+            remaining.items.add(existingFile);
           }
-          input.files = remaining.files;
-          setSelectedPhotos(existing => {
-            const remaining: typeof existing = [];
-            // Must be done manually when no longer needed
-            // @see https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static#memory_management
-            for (const existingFile of existing) {
-              if (name !== existingFile.name) {
-                remaining.push(existingFile);
-              }
-              URL.revokeObjectURL(existingFile.src);
-            }
-
-            return remaining;
-          });
         }
+        input.files = remaining.files;
+        setSelectedPhotos(existing => {
+          const remaining: typeof existing = [];
+          // Must be done manually when no longer needed
+          // @see https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static#memory_management
+          for (const existingFile of existing) {
+            if (name !== existingFile.name) {
+              remaining.push(existingFile);
+            }
+            URL.revokeObjectURL(existingFile.src);
+          }
+
+          return remaining;
+        });
       }
     },
     []
@@ -422,7 +423,7 @@ export const RsvpForm = ({
       )}
       <button
         type="submit"
-        disabled={isPending || aFileIsTooLarge || tooManyFiles}
+        disabled={isPending || someFileIsTooLarge || tooManyFiles}
       >
         {buttonText}
       </button>
