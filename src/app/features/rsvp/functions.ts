@@ -6,13 +6,7 @@ import type { ActionState } from "./actions";
 export const getAllRsvpsWithPhotos = async () => {
   return await db.rsvp.findMany({
     include: {
-      photos: {
-        select: {
-          createdAt: true,
-          fileName: true,
-          id: true,
-        },
-      },
+      photos: {},
     },
     orderBy: {
       createdAt: "desc",

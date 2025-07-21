@@ -1,11 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+} from "react";
+import { Image } from "@/app/components/Image";
 import { ONE_KiB, ONE_MiB, sec } from "@/app/constants";
-
+import { link } from "@/app/navigation";
+import type { Photo } from "@/db";
 import type { ActionState } from "../actions";
 import { RSVP_FIELDS } from "../fields";
 import { useRsvpAction } from "../hooks";
+import { deletePhoto } from "../photo/functions";
 
 const getFileSize = (size: number) => {
   if (size < ONE_KiB) {
@@ -143,20 +153,109 @@ export const RsvpForm = ({
 
   const title = submissionType === "update" ? "Edit Your RSVP" : "RSVP";
 
-  const [filesTooLarge, setFilesTooLarge] = useState(false);
-  // const [tooManyFiles, setTooManyFiles] = useState(false);
-  const onPhotosChange = useCallback(
+  const [selectedPhotos, setSelectedPhotos] = useState<
+    {
+      src: string;
+      size: number;
+      id: null;
+      name: string;
+    }[]
+  >([]);
+  const [existingPhotos, removeExistingPhoto] = useReducer(
+    (
+      state,
+      {
+        id,
+      }: {
+        id: string;
+      }
+    ) => {
+      void deletePhoto({
+        id,
+      });
+      return state.filter(item => item.id !== id);
+    },
+    initialRsvp?.photos?.successes,
+    (photos: Photo[] | undefined) =>
+      (photos || []).map(({ fileName, id }) => ({
+        src: link("/photo/:fileName", {
+          fileName,
+        }),
+        size: null,
+        name: fileName,
+        id,
+      }))
+  );
+  const allPhotos = [
+    ...(existingPhotos || []),
+    ...selectedPhotos,
+  ];
+  const tooManyFiles = allPhotos.length > RSVP_FIELDS.photos.maxLength;
+  const aFileIsTooLarge = allPhotos.some(
+    ({ size }) => size && size > RSVP_FIELDS.photos.maxSize
+  );
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const onFileInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
       if (!files) {
         return;
       }
 
+      const selected: typeof selectedPhotos = [];
       for (const file of files) {
-        const tooBig = getFileSize(file.size).mib > RSVP_FIELDS.photos.maxSize;
-        if (tooBig) {
-          setFilesTooLarge(true);
-          break;
+        selected.push({
+          src: URL.createObjectURL(file),
+          // src: file.webkitRelativePath,
+          size: getFileSize(file.size).mib,
+          name: file.name,
+          id: null,
+        });
+      }
+
+      setSelectedPhotos(existing => {
+        // Must be done manually when no longer needed
+        // @see https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static#memory_management
+        for (const { src } of existing) {
+          URL.revokeObjectURL(src);
+        }
+
+        return selected;
+      });
+    },
+    []
+  );
+
+  const removePhoto = useCallback(
+    ({ name, id }: { name: string | null; id: string | null }) => {
+      if (id) {
+        removeExistingPhoto({
+          id,
+        });
+      } else {
+        const input = fileInputRef.current;
+
+        if (name && input?.files) {
+          const remaining = new DataTransfer();
+          for (const existingFile of input.files) {
+            if (name !== existingFile.name) {
+              remaining.items.add(existingFile);
+            }
+          }
+          input.files = remaining.files;
+          setSelectedPhotos(existing => {
+            const remaining: typeof existing = [];
+            // Must be done manually when no longer needed
+            // @see https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static#memory_management
+            for (const existingFile of existing) {
+              if (name !== existingFile.name) {
+                remaining.push(existingFile);
+              }
+              URL.revokeObjectURL(existingFile.src);
+            }
+
+            return remaining;
+          });
         }
       }
     },
@@ -219,7 +318,6 @@ export const RsvpForm = ({
       <div>
         <label htmlFor={RSVP_FIELDS.plusOne.name}>
           <input
-            checked={hasPlusOne}
             defaultChecked={rsvp?.plusOne}
             disabled={isPending}
             id={RSVP_FIELDS.plusOne.name}
@@ -280,20 +378,41 @@ export const RsvpForm = ({
       </div>
 
       <div>
+        {allPhotos?.map(({ src, size, id, name }) => {
+          const tooLarge = size && size > RSVP_FIELDS.photos.maxSize;
+          const remove = () =>
+            removePhoto({
+              name,
+              id,
+            });
+          return (
+            <div key={src}>
+              <button type="button" onClick={remove}>
+                Remove
+              </button>
+              <Image src={src} alt="Uploaded photo" />
+              {tooLarge && (
+                <span>
+                  File size {size} exceeds limit of {RSVP_FIELDS.photos.maxSize}
+                </span>
+              )}
+            </div>
+          );
+        })}
         <label htmlFor={RSVP_FIELDS.photos.name}>
           Upload photos
           <input
             type="file"
-            multiple={true}
             accept={RSVP_FIELDS.photos.mimeType.join(", ")}
             disabled={isPending}
             id={RSVP_FIELDS.photos.name}
-            name={RSVP_FIELDS.photos.name}
             max={RSVP_FIELDS.photos.maxLength}
-            onChange={onPhotosChange}
+            multiple={true}
+            name={RSVP_FIELDS.photos.name}
+            onChange={onFileInputChange}
+            ref={fileInputRef}
           />
         </label>
-        {filesTooLarge && "Must be smaller than 10 MiB"}
       </div>
 
       {/* {onCancelUpdating && submissionType === "update" && (
@@ -301,7 +420,10 @@ export const RsvpForm = ({
           Cancel
         </button>
       )} */}
-      <button type="submit" disabled={isPending || filesTooLarge}>
+      <button
+        type="submit"
+        disabled={isPending || aFileIsTooLarge || tooManyFiles}
+      >
         {buttonText}
       </button>
     </form>

@@ -10,7 +10,9 @@ export const Rsvps = async () => {
       {rsvps.length === 0 ? (
         <p>No RSVPs yet.</p>
       ) : (
-        rsvps.map(rsvp => <RsvpItem key={rsvp.id} rsvp={rsvp} />)
+        rsvps.map(({ photos, ...rsvp }) => (
+          <RsvpItem key={rsvp.id} rsvp={rsvp} photos={photos} />
+        ))
       )}
     </div>
   );

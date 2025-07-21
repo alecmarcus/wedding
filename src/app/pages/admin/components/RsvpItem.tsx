@@ -10,11 +10,13 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { link } from "@/app/navigation";
 import type { Photo, Rsvp } from "@/db";
 
-type RsvpWithPhotos = Rsvp & {
-  photos: Pick<Photo, "id" | "fileName" | "createdAt">[];
-};
-
-export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
+export const RsvpItem = ({
+  rsvp,
+  photos,
+}: {
+  rsvp: Rsvp;
+  photos: Photo[] | null;
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const startEditing = useCallback(() => {
     setIsEditing(true);
@@ -129,7 +131,7 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
         )}
         {rsvp.message && <p>Message: {rsvp.message}</p>}
         <p>RSVP Date: {new Date(rsvp.createdAt).toLocaleDateString()}</p>
-        <p>Photos Uploaded: {rsvp.photos.length}</p>
+        {photos && <p>Photos Uploaded: {photos.length}</p>}
 
         <div>
           <button type="button" onClick={startEditing} disabled={isEditing}>
@@ -150,8 +152,8 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
             {isResendPending ? "Sending..." : "Resend Confirmation"}
           </button>
           {resendConfirmationText}
-          {rsvp.photos.length > 0 && (
-            <button type="button" onClick={() => setShowPhotos(!showPhotos)}>
+          {photos && (
+            <button type="button" onClick={() => setShowPhotos(show => !show)}>
               {showPhotos ? "Hide Photos" : "View Photos"}
             </button>
           )}
@@ -160,27 +162,42 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
 
       {isEditing && (
         <RsvpForm
-          rsvp={rsvp}
+          rsvp={{
+            ...rsvp,
+            photos: photos
+              ? {
+                  successes: photos,
+                  failures: [],
+                  failureCount: 0,
+                  successCount: photos.length,
+                  total: photos.length,
+                }
+              : null,
+          }}
           onDoneEditing={stopEditing}
-          onCancelUpdating={stopEditing}
+          error={null}
+          // onCancelUpdating={stopEditing}
         />
       )}
 
-      {showPhotos && rsvp.photos.length > 0 && (
+      {showPhotos && photos && (
         <div>
-          <h4>Uploaded Photos ({rsvp.photos.length})</h4>
-          {rsvp.photos.map(photo => (
-            <div key={photo.id}>
+          {photos.map(({ id, fileName, createdAt }) => (
+            <div key={id}>
               <Image
                 src={link("/photo/:fileName", {
-                  fileName: photo.fileName,
+                  fileName,
                 })}
                 alt={`Uploaded by ${rsvp.name}`}
               />
-              <p>Uploaded: {new Date(photo.createdAt).toLocaleDateString()}</p>
+              <p>Uploaded: {new Date(createdAt).toLocaleDateString()}</p>
               <button
                 type="button"
-                onClick={() => handleDeletePhoto(photo.id)}
+                onClick={() =>
+                  handleDeletePhoto({
+                    id,
+                  })
+                }
                 disabled={isDeletingPhoto}
               >
                 {isDeletingPhoto ? "Deleting..." : "Delete Photo"}
