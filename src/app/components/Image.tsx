@@ -4,11 +4,11 @@ type Props = {
   width?: number;
   height?: number;
   loading?: "lazy" | "eager";
-  sizes?: string;
+  // sizes?: string;
   className?: string;
 };
 
-const fileNameRegex = /\.[^/.]+$/;
+// const fileNameRegex = /\.[^/.]+$/;
 
 export const Image = ({
   src,
@@ -16,14 +16,14 @@ export const Image = ({
   width,
   height,
   loading = "lazy",
-  sizes = "100vw",
+  // sizes = "100vw",
   className,
 }: Props) => {
-  const srcWithoutExt = src.replace(fileNameRegex, "");
+  // const srcWithoutExt = src.replace(fileNameRegex, "");
 
   return (
     <picture className={className}>
-      <source
+      {/* <source
         type="image/avif"
         srcSet={`${srcWithoutExt}.avif`}
         sizes={sizes}
@@ -32,7 +32,7 @@ export const Image = ({
         type="image/webp"
         srcSet={`${srcWithoutExt}.webp`}
         sizes={sizes}
-      />
+      /> */}
       <img
         src={src}
         alt={alt}

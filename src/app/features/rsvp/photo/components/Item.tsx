@@ -1,4 +1,5 @@
 import { Image } from "@@/components/Image";
+import { link } from "@/app/navigation";
 import type { Photo } from "@/db";
 
 type Props = {
@@ -12,20 +13,22 @@ export const PhotoItem = ({
   showUploader = true,
   showDate = true,
 }: Props) => {
+  const src = link("/photo/:fileName", {
+    fileName: photo.fileName,
+  });
+
+  const created = new Date(photo.createdAt).toLocaleDateString();
+  const alt = `Uploaded${
+    photo.uploaderName ? ` by ${photo.uploaderName}` : ""
+  } on ${created}`;
+
   return (
     <div>
-      <Image
-        src={`/api/photos/${photo.fileName}`}
-        alt={`Uploaded${
-          photo.uploaderName ? ` by ${photo.uploaderName}` : ""
-        } on ${new Date(photo.createdAt).toLocaleDateString()}`}
-      />
+      <Image src={src} alt={alt} />
       {showUploader && photo.uploaderName && (
         <p>Uploaded by: {photo.uploaderName}</p>
       )}
-      {showDate && (
-        <p>Uploaded: {new Date(photo.createdAt).toLocaleDateString()}</p>
-      )}
+      {showDate && <p>Uploaded: {created}</p>}
     </div>
   );
 };

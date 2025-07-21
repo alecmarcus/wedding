@@ -1,3 +1,5 @@
+"use server";
+
 import { requestInfo } from "rwsdk/worker";
 import type { Rsvp } from "@/db";
 

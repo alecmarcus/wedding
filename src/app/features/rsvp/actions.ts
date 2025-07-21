@@ -17,10 +17,7 @@ import {
 } from "valibot";
 import { db, type Rsvp } from "@/db";
 import { RSVP_FIELDS } from "./fields";
-import {
-  type ActionState as UploadPhotosActionState,
-  uploadPhotos,
-} from "./photo/actions";
+import { type UploadPhotosResponse, uploadPhotos } from "./photo/actions";
 
 const rsvpSchema = object({
   name: pipe(string(), maxLength(RSVP_FIELDS.name.max)),
@@ -189,7 +186,7 @@ const updateRsvp = async ({
 export type ActionState = {
   data:
     | (Rsvp & {
-        photos: UploadPhotosActionState["data"];
+        photos: UploadPhotosResponse | null;
       })
     | null;
   error: string | null;
@@ -235,18 +232,20 @@ export const rsvp = async (
     }
 
     const { data: rsvpData, ...state } = await createRsvp(data);
-    let uploadResult: UploadPhotosActionState | null = null;
+    let uploadResult: UploadPhotosResponse | null = null;
 
     if (rsvpData?.editToken) {
-      uploadResult = await uploadPhotos(
-        {
-          data: null,
-          editToken: rsvpData?.editToken,
-          error: null,
-          isSuccess: null,
-        },
-        payload
-      );
+      uploadResult = (
+        await uploadPhotos(
+          {
+            data: null,
+            editToken: rsvpData?.editToken,
+            error: null,
+            isSuccess: null,
+          },
+          payload
+        )
+      ).data;
     }
 
     return {
@@ -254,7 +253,7 @@ export const rsvp = async (
       data: rsvpData
         ? {
             ...rsvpData,
-            photos: uploadResult ? uploadResult.data : null,
+            photos: uploadResult,
           }
         : null,
     };

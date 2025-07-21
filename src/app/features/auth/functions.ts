@@ -128,6 +128,7 @@ export const startPasskeyRegistration = async ({
     token: env.TURNSTILE_SITE_KEY,
     secretKey: env.TURNSTILE_SECRET_KEY,
   });
+
   if (!verifyTurnstile) {
     throw new Error("Bot protection verification failed");
   }

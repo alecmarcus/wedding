@@ -1,4 +1,4 @@
-import { PhotoItem } from "@@/features/photo/components/Item";
+import { PhotoItem } from "@@/features/rsvp/photo/components/Item";
 import type { Photo, Rsvp } from "@/db";
 
 type PhotoWithRsvp = Photo & {

@@ -1,6 +1,7 @@
 "use server";
 
-import { db, type Rsvp } from "@/db";
+import { db } from "@/db";
+import type { ActionState } from "./actions";
 
 export const getAllRsvpsWithPhotos = async () => {
   return await db.rsvp.findMany({
@@ -23,11 +24,7 @@ export const getRsvpByEditToken = async ({
   editToken,
 }: {
   editToken: string;
-}): Promise<{
-  data: Rsvp | null;
-  error: string | null;
-  isSuccess: boolean;
-}> => {
+}): Promise<ActionState> => {
   try {
     if (!editToken) {
       throw new Error("Invalid edit token");
@@ -43,8 +40,23 @@ export const getRsvpByEditToken = async ({
       throw new Error("RSVP not found");
     }
 
+    const photos = await db.photo.findMany({
+      where: {
+        rsvpId: rsvp.id,
+      },
+    });
+
     return {
-      data: rsvp,
+      data: {
+        ...rsvp,
+        photos: {
+          failureCount: 0,
+          failures: [],
+          successCount: photos.length,
+          total: photos.length,
+          successes: photos,
+        },
+      },
       error: null,
       isSuccess: true,
     };

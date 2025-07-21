@@ -1,10 +1,30 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { sec } from "@/app/constants";
-import type { Rsvp } from "@/db";
+import { ONE_KiB, ONE_MiB, sec } from "@/app/constants";
+
+import type { ActionState } from "../actions";
 import { RSVP_FIELDS } from "../fields";
 import { useRsvpAction } from "../hooks";
+
+const getFileSize = (size: number) => {
+  if (size < ONE_KiB) {
+    return {
+      mib: size / ONE_MiB,
+      labelled: `${size} bytes`,
+    };
+  }
+  if (size >= ONE_KiB && size < ONE_MiB) {
+    return {
+      mib: size / ONE_MiB,
+      labelled: `${(size / ONE_KiB).toFixed(1)} KiB`,
+    };
+  }
+  return {
+    mib: size / ONE_MiB,
+    labelled: `${(size / ONE_MiB).toFixed(1)} MiB`,
+  };
+};
 
 type RsvpFormSuccessProps = {
   submissionType: "update" | "create";
@@ -52,7 +72,7 @@ export const RsvpForm = ({
   onDoneEditing,
   // onCancelUpdating,
 }: {
-  rsvp: Rsvp | null;
+  rsvp: ActionState["data"];
   onDoneEditing?: () => void;
   // onCancelUpdating?: () => void;
   error: string | null;
@@ -122,6 +142,26 @@ export const RsvpForm = ({
   ]);
 
   const title = submissionType === "update" ? "Edit Your RSVP" : "RSVP";
+
+  const [filesTooLarge, setFilesTooLarge] = useState(false);
+  // const [tooManyFiles, setTooManyFiles] = useState(false);
+  const onPhotosChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const files = e.target.files;
+      if (!files) {
+        return;
+      }
+
+      for (const file of files) {
+        const tooBig = getFileSize(file.size).mib > RSVP_FIELDS.photos.maxSize;
+        if (tooBig) {
+          setFilesTooLarge(true);
+          break;
+        }
+      }
+    },
+    []
+  );
 
   if (!isEditing) {
     return (
@@ -239,12 +279,29 @@ export const RsvpForm = ({
         </label>
       </div>
 
+      <div>
+        <label htmlFor={RSVP_FIELDS.photos.name}>
+          Upload photos
+          <input
+            type="file"
+            multiple={true}
+            accept={RSVP_FIELDS.photos.mimeType.join(", ")}
+            disabled={isPending}
+            id={RSVP_FIELDS.photos.name}
+            name={RSVP_FIELDS.photos.name}
+            max={RSVP_FIELDS.photos.maxLength}
+            onChange={onPhotosChange}
+          />
+        </label>
+        {filesTooLarge && "Must be smaller than 10 MiB"}
+      </div>
+
       {/* {onCancelUpdating && submissionType === "update" && (
         <button type="button" disabled={isPending} onClick={onCancelUpdating}>
           Cancel
         </button>
       )} */}
-      <button type="submit" disabled={isPending}>
+      <button type="submit" disabled={isPending || filesTooLarge}>
         {buttonText}
       </button>
     </form>

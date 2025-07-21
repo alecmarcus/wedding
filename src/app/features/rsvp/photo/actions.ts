@@ -1,3 +1,5 @@
+"use server";
+
 import { env } from "cloudflare:workers";
 import {
   array,
@@ -43,14 +45,6 @@ type FailedUpload = {
   file: File;
 };
 
-type UploadPhotosResponse = {
-  failureCount: number;
-  failures: FailedUpload[];
-  successCount: number;
-  successes: Photo[];
-  total: number;
-};
-
 type Token =
   | {
       uploadToken: string;
@@ -61,11 +55,19 @@ type Token =
       editToken: string;
     };
 
-export type ActionState = {
+type ActionState = {
   isSuccess: boolean | null;
   error: string | null;
   data: UploadPhotosResponse | null;
 } & Token;
+
+export type UploadPhotosResponse = {
+  failureCount: number;
+  failures: FailedUpload[];
+  successCount: number;
+  successes: Photo[];
+  total: number;
+};
 
 export const uploadPhotos = async (
   { uploadToken, editToken }: ActionState,

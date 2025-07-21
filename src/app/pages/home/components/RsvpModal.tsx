@@ -2,10 +2,9 @@ import { RsvpForm } from "@@/features/rsvp/components/Form";
 import { Suspense } from "react";
 import { Link } from "@/app/components/Link";
 import { getRsvpByEditToken } from "@/app/features/rsvp/functions";
-import type { Rsvp } from "@/db";
 
 export const RsvpModal = async ({ token }: { token?: string }) => {
-  let rsvp: Rsvp | null = null;
+  let rsvp: Awaited<ReturnType<typeof getRsvpByEditToken>>["data"] = null;
   let error: string | null = null;
 
   if (token) {

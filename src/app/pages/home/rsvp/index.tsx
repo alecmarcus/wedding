@@ -1,13 +1,13 @@
 import type { RequestInfo } from "rwsdk/worker";
 import { RsvpModal } from "../components/RsvpModal";
 
-export type RsvpTokenRequest = RequestInfo<{
+type RsvpByTokenRequest = RequestInfo<{
   token?: string;
 }>;
 
 export const Rsvp = (request: RequestInfo) => {
   const {
     params: { token },
-  } = request as RsvpTokenRequest;
+  } = request as RsvpByTokenRequest;
   return <RsvpModal token={token} />;
 };

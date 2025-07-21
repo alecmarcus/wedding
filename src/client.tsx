@@ -1,3 +1,4 @@
+import type { CallServerCallback } from "react-server-dom-webpack/client.browser";
 import {
   type ActionResponse,
   initClient,
@@ -6,10 +7,10 @@ import {
 } from "rwsdk/client";
 
 const transport: Transport = transportContext => {
-  const fetchCallServer = async <Result,>(
-    id: null | string,
-    args: null | unknown[]
-  ): Promise<Result> => {
+  const fetchCallServer = (async <Result,>(
+    id: string,
+    args: unknown[] | null
+  ): Promise<Result | undefined> => {
     const { createFromFetch, encodeReply } = await import(
       "react-server-dom-webpack/client.browser"
     );
@@ -24,7 +25,7 @@ const transport: Transport = transportContext => {
 
         return fetch(url, {
           method: "POST",
-          body: args != null ? await encodeReply(args) : null,
+          body: args == null ? null : await encodeReply(args),
         }).then(response => {
           if (response.redirected) {
             window.history.replaceState(window.history.state, "", response.url);
@@ -41,22 +42,11 @@ const transport: Transport = transportContext => {
 
       transportContext.setRscPayload(streamData);
       const result = await streamData;
-      return (
-        result as {
-          actionResult: Result;
-        }
-      ).actionResult;
-    } catch (e) {
-      if (
-        e instanceof Error &&
-        e.message === "Failed to fetch" &&
-        e.name === "TypeError"
-      ) {
-        window.location.replace(window.location.href);
-      }
-      throw e;
+      return result.actionResult;
+    } catch {
+      window.location.replace(window.location.href);
     }
-  };
+  }) as CallServerCallback;
 
   return fetchCallServer;
 };

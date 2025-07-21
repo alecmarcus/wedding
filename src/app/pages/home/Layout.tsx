@@ -1,5 +1,5 @@
 import { Link } from "@@/components/Link";
-import { getAllPhotos } from "@@/features/photo/functions";
+import { getAllPhotos } from "@@/features/rsvp/photo/functions";
 import { PhotoGallery } from "@@/pages/home/components/PhotoGallery";
 import type { LayoutProps } from "rwsdk/router";
 

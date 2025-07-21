@@ -3,10 +3,11 @@
 import { Image } from "@@/components/Image";
 import { sec } from "@@/constants";
 import { useResendConfirmationRequest } from "@@/features/email/hooks";
-import { useDeletePhotoRequest } from "@@/features/photo/hooks";
+import { RsvpForm } from "@@/features/rsvp/components/Form";
 import { useDeleteRsvpRequest } from "@@/features/rsvp/hooks";
+import { useDeletePhotoRequest } from "@@/features/rsvp/photo/hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { RsvpForm } from "@/app/features/rsvp/components/Form";
+import { link } from "@/app/navigation";
 import type { Photo, Rsvp } from "@/db";
 
 type RsvpWithPhotos = Rsvp & {
@@ -59,7 +60,7 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
   const handleDeleteRsvp = useCallback(() => {
     if (window.confirm("Are you sure you want to delete this RSVP?")) {
       deleteRsvp({
-        rsvpId: rsvp.id,
+        id: rsvp.id,
       });
     }
   }, [
@@ -69,7 +70,7 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
 
   const handleResendConfirmation = useCallback(() => {
     resendConfirmation({
-      rsvpId: rsvp.id,
+      id: rsvp.id,
     });
   }, [
     resendConfirmation,
@@ -171,7 +172,9 @@ export const RsvpItem = ({ rsvp }: { rsvp: RsvpWithPhotos }) => {
           {rsvp.photos.map(photo => (
             <div key={photo.id}>
               <Image
-                src={`/api/photos/${photo.fileName}`}
+                src={link("/photo/:fileName", {
+                  fileName: photo.fileName,
+                })}
                 alt={`Uploaded by ${rsvp.name}`}
               />
               <p>Uploaded: {new Date(photo.createdAt).toLocaleDateString()}</p>

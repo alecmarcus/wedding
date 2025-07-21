@@ -1,7 +1,8 @@
-const ONE_MiB = 1024 ^ 2;
-const ONE_S = 1000;
-
+export const ONE_KiB = 1e3;
+export const ONE_MiB = 1e6;
 export const mib = (mebibytes: number) => mebibytes * ONE_MiB;
+
+export const ONE_S = 1000;
 export const sec = (seconds: number) => seconds * ONE_S;
 
 export const STATUS = {

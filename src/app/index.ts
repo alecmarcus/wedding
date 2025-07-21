@@ -1,4 +1,4 @@
-import { photosRoutes } from "@@/api/photos/routes";
+import { apiPhotoRoutes } from "@@/api/photo/routes";
 import { Document } from "@@/layouts/Document";
 import { adminRoutes } from "@@/pages/admin/routes";
 import { homeRoutes } from "@@/pages/home/routes";
@@ -22,6 +22,6 @@ export const app = defineApp([
     homeRoutes,
     adminRoutes,
     uploadRoutes,
-    photosRoutes,
+    apiPhotoRoutes,
   ]),
 ]);

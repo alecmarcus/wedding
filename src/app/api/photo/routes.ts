@@ -1,16 +1,18 @@
+"use server";
+
+import { STATUS } from "@@/constants";
 import { env } from "cloudflare:workers";
 import { route } from "rwsdk/router";
 import type { RequestInfo } from "rwsdk/worker";
-import { STATUS } from "@/app/constants";
 
-export type PhotosFileNameRequest = RequestInfo<{
+type PhotoByFileNameRequest = RequestInfo<{
   fileName: string;
 }>;
 
-export const photosRoutes = route("/api/photos/:fileName", async request => {
+const photoByFileName = route("/photo/:fileName", async request => {
   const {
     params: { fileName },
-  } = request as PhotosFileNameRequest;
+  } = request as PhotoByFileNameRequest;
   try {
     const object = await env.PHOTOS.get(fileName);
 
@@ -33,3 +35,5 @@ export const photosRoutes = route("/api/photos/:fileName", async request => {
     });
   }
 });
+
+export const apiPhotoRoutes = photoByFileName;
