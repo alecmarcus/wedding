@@ -44,15 +44,11 @@ export const sendRsvpConfirmationEmail = ({ rsvp }: { rsvp: Rsvp }) => {
 
 export const resendConfirmationEmail = async ({ id }: { id: string }) => {
   try {
-    const rsvp = await db.rsvp.findUnique({
+    const rsvp = await db.rsvp.findUniqueOrThrow({
       where: {
         id,
       },
     });
-
-    if (!rsvp) {
-      throw new Error("RSVP not found");
-    }
 
     await sendRsvpConfirmationEmail({
       rsvp,

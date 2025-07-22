@@ -1,12 +1,8 @@
 import { PhotoItem } from "@@/features/rsvp/photo/components/Item";
-import type { Photo, Rsvp } from "@/db";
-
-type PhotoWithRsvp = Photo & {
-  rsvp: Pick<Rsvp, "name" | "email"> | null;
-};
+import type { Photo } from "@/db";
 
 type PhotoGalleryProps = {
-  photos: PhotoWithRsvp[];
+  photos: Photo[];
 };
 
 export const PhotoGallery = ({ photos }: PhotoGalleryProps) => {

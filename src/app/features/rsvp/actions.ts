@@ -123,7 +123,7 @@ const updateRsvp = async ({
   editToken: string;
 } & Omit<ParsedFormData, "photos">): Promise<RsvpActionState> => {
   try {
-    const existingRsvp = await db.rsvp.findUnique({
+    const existingRsvp = await db.rsvp.findUniqueOrThrow({
       where: {
         editToken,
       },
@@ -131,44 +131,40 @@ const updateRsvp = async ({
 
     // Extra cautious check.
     // We don't allow editing name and email on the client currently.
-    if (existingRsvp) {
-      if (email !== existingRsvp.email) {
-        const emailExists = await db.rsvp.findFirst({
-          where: {
-            email,
-            NOT: {
-              id: existingRsvp.id,
-            },
-          },
-        });
-
-        if (emailExists) {
-          throw new Error("An RSVP with this email already exists");
-        }
-      }
-
-      const updatedRsvp = await db.rsvp.update({
+    if (email !== existingRsvp.email) {
+      const emailExists = await db.rsvp.findFirst({
         where: {
-          editToken,
-        },
-        data: {
           email,
-          ...data,
+          NOT: {
+            id: existingRsvp.id,
+          },
         },
       });
 
-      await sendRsvpUpdateEmail({
-        rsvp: updatedRsvp,
-      });
-
-      return {
-        data: updatedRsvp,
-        error: null,
-        isSuccess: true,
-      };
+      if (emailExists) {
+        throw new Error("An RSVP with this email already exists");
+      }
     }
 
-    throw new Error("RSVP not found");
+    const updatedRsvp = await db.rsvp.update({
+      where: {
+        editToken,
+      },
+      data: {
+        email,
+        ...data,
+      },
+    });
+
+    await sendRsvpUpdateEmail({
+      rsvp: updatedRsvp,
+    });
+
+    return {
+      data: updatedRsvp,
+      error: null,
+      isSuccess: true,
+    };
   } catch (error) {
     const errorMessage =
       error instanceof Error

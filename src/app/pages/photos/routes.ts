@@ -2,6 +2,7 @@ import { isSetupNeeded } from "@@/features/auth/functions";
 import { prefix, route } from "rwsdk/router";
 import { STATUS } from "@/constants";
 import { Photos } from ".";
+import { Admin } from "./admin";
 import { Login } from "./login";
 
 const login = route("/login", [
@@ -38,7 +39,7 @@ const admin = route("/admin", [
       });
     }
   },
-  Photos,
+  Admin,
 ]);
 
 const index = route("/:token", Photos);

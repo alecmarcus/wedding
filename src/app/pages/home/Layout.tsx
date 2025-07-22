@@ -1,10 +1,14 @@
 import { Link } from "@@/components/Link";
-import { getAllPhotos } from "@@/features/rsvp/photo/functions";
 import { PhotoGallery } from "@@/pages/home/components/PhotoGallery";
 import type { LayoutProps } from "rwsdk/router";
+import { db } from "@/db";
 
 const PhotoSection = async () => {
-  const photos = await getAllPhotos();
+  const photos = await db.photo.findMany({
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
   return <PhotoGallery photos={photos} />;
 };
 

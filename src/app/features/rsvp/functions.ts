@@ -24,15 +24,11 @@ export const getRsvpByEditToken = async ({
       throw new Error("Invalid edit token");
     }
 
-    const rsvp = await db.rsvp.findUnique({
+    const rsvp = await db.rsvp.findUniqueOrThrow({
       where: {
         editToken,
       },
     });
-
-    if (!rsvp) {
-      throw new Error("RSVP not found");
-    }
 
     const photos = await db.photo.findMany({
       where: {

@@ -74,13 +74,17 @@ export const uploadPhotos = async (
   formData: FormData
 ): Promise<ActionState> => {
   try {
+    if (!(uploadToken || editToken)) {
+      throw new Error("No token provided");
+    }
+
     const { photos } = parseAndValidateFormData(formData);
 
     if (photos === null) {
       throw new Error("No files provided");
     }
 
-    const rsvp = await db.rsvp.findUnique({
+    const rsvp = await db.rsvp.findUniqueOrThrow({
       where: {
         uploadToken: uploadToken || undefined,
         editToken: editToken || undefined,
@@ -91,10 +95,6 @@ export const uploadPhotos = async (
         name: true,
       },
     });
-
-    if (!rsvp) {
-      throw new Error("Invalid token");
-    }
 
     const uploads = photos.map(async file => {
       const randomString = crypto.randomUUID();

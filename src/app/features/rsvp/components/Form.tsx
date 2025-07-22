@@ -252,6 +252,7 @@ export const RsvpForm = ({
         uploadedPhotos={
           rsvp?.photos?.successes || initialRsvp?.photos?.successes || []
         }
+        editToken={rsvp?.editToken}
         ref={photoInputHandle}
       />
 

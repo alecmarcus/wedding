@@ -1,3 +1,5 @@
+"use client";
+
 import { Image } from "@@/components/Image";
 import { useImperativeHandle } from "react";
 import type { Photo } from "@/db";
@@ -10,10 +12,14 @@ export const PhotoInput = ({
   uploadedPhotos,
   isPending,
   ref,
+  uploadToken,
+  editToken,
 }: {
   uploadedPhotos: Photo[];
   isPending: boolean;
   ref?: React.Ref<PhotoInputHandle>;
+  uploadToken?: string;
+  editToken?: string;
 }) => {
   const photoMgmt = useManagePhotos({
     uploadedPhotos,
@@ -27,16 +33,38 @@ export const PhotoInput = ({
     <div>
       {photoMgmt.state.allPhotos.map(({ src, size, id, name }) => {
         const tooLarge = size && size > UPLOAD_PHOTOS_FIELDS.photos.maxSize;
-        const remove = () =>
+        const remove = () => {
+          let token:
+            | {
+                uploadToken: string;
+              }
+            | {
+                editToken: string;
+              };
+
+          if (uploadToken) {
+            token = {
+              uploadToken,
+            };
+          } else if (editToken) {
+            token = {
+              editToken,
+            };
+          } else {
+            return;
+          }
+
           photoMgmt.handlers.removePhoto(
             id
               ? {
                   id,
+                  ...token,
                 }
               : {
                   name,
                 }
           );
+        };
         return (
           <div key={src}>
             <button type="button" onClick={remove}>

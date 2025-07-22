@@ -3,24 +3,6 @@
 import { env } from "cloudflare:workers";
 import { db } from "@/db";
 
-export const getAllPhotos = async () => {
-  const photos = await db.photo.findMany({
-    include: {
-      rsvp: {
-        select: {
-          email: true,
-          name: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-
-  return photos;
-};
-
 export const getPhotosByRsvp = async (
   where:
     | {
@@ -31,16 +13,12 @@ export const getPhotosByRsvp = async (
       }
 ) => {
   try {
-    const rsvp = await db.rsvp.findUnique({
+    const rsvp = await db.rsvp.findUniqueOrThrow({
       where,
       select: {
         id: true,
       },
     });
-
-    if (!rsvp) {
-      throw new Error("Invalid token");
-    }
 
     const photos = await db.photo.findMany({
       where: {
@@ -68,27 +46,35 @@ export const getPhotosByRsvp = async (
 };
 
 export const deletePhoto = async (
-  where:
+  identifier:
     | {
         id: string;
       }
     | {
         fileName: string;
+      },
+  token:
+    | {
+        uploadToken: string;
+      }
+    | {
+        editToken: string;
       }
 ) => {
   try {
-    const photo = await db.photo.findUnique({
-      where,
+    const photo = await db.photo.findUniqueOrThrow({
+      where: identifier,
+      include: {
+        rsvp: {
+          where: token,
+        },
+      },
     });
-
-    if (!photo) {
-      throw new Error("Photo not found");
-    }
 
     await Promise.allSettled([
       env.PHOTOS.delete(photo.fileName),
       db.photo.delete({
-        where,
+        where: identifier,
       }),
     ]);
 
@@ -116,13 +102,9 @@ export const deleteAllPhotosByRsvp = async (
       }
 ) => {
   try {
-    const rsvp = await db.rsvp.findUnique({
+    const rsvp = await db.rsvp.findUniqueOrThrow({
       where,
     });
-
-    if (!rsvp) {
-      throw new Error("Invalid token");
-    }
 
     const photos = await db.photo.findMany({
       where: {

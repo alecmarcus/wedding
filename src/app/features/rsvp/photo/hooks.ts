@@ -86,12 +86,12 @@ export const useDeletePhotoRequest = () => {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const action = useCallback(
-    async (where: Parameters<typeof deletePhoto>[0]) => {
+    async ([identifier, authorization]: Parameters<typeof deletePhoto>) => {
       try {
         setError(null);
         setIsSuccess(false);
 
-        const result = await deletePhoto(where);
+        const result = await deletePhoto(identifier, authorization);
 
         if (result.isSuccess) {
           setIsSuccess(true);
@@ -108,9 +108,12 @@ export const useDeletePhotoRequest = () => {
   );
 
   const request = useCallback(
-    (where: Parameters<typeof deletePhoto>[0]) => {
+    ([identifier, authorization]: Parameters<typeof deletePhoto>) => {
       startTransition(async () => {
-        await action(where);
+        await action([
+          identifier,
+          authorization,
+        ]);
       });
     },
     [
@@ -138,13 +141,24 @@ export const useManagePhotos = ({
       state,
       {
         id,
+        ...authorization
       }: {
         id: string;
-      }
+      } & (
+        | {
+            uploadToken: string;
+          }
+        | {
+            editToken: string;
+          }
+      )
     ) => {
-      void deletePhoto({
-        id,
-      });
+      void deletePhoto(
+        {
+          id,
+        },
+        authorization
+      );
       return state.filter(item => item.id !== id);
     },
     uploadedPhotos,
@@ -216,9 +230,16 @@ export const useManagePhotos = ({
         | {
             name: string;
           }
-        | {
+        | ({
             id: string;
-          }
+          } & (
+            | {
+                uploadToken: string;
+              }
+            | {
+                editToken: string;
+              }
+          ))
     ) => {
       if ("id" in where && where.id) {
         return removeExistingPhoto(where);
