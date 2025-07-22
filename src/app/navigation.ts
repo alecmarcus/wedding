@@ -64,11 +64,11 @@ const routes = [
   "/admin/setup",
   "/photo/:fileName",
   "/photos/:token",
+  "/photos/:token",
+  "/photos/admin",
+  "/photos/login",
   "/rsvp",
   "/rsvp/:token",
-  "/upload/:token",
-  "/upload/admin",
-  "/upload/login",
 ] as const;
 
 type Routes = typeof routes;
@@ -80,6 +80,18 @@ export const link = defineLinks(routes);
  * whose type matches the parameters of `navigate()`
  */
 export type Route = NavigateTuples<Routes>;
+
+/** Routes which do not accept params */
+export type StaticRoute = Exclude<
+  Route,
+  | [
+      string,
+    ]
+  | [
+      string,
+      object,
+    ]
+>;
 
 /**
  * Given a route as a path or path + params, will execute client side navigation event to that destination.

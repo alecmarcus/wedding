@@ -1,44 +1,22 @@
-import { isSetupNeeded } from "@@/features/auth/functions";
+import {
+  requireAuth,
+  requireNoAuth,
+  requireSetup,
+} from "@@/features/auth/middleware";
 import { prefix, route } from "rwsdk/router";
-import { STATUS } from "@/constants";
+
 import { Photos } from ".";
 import { Admin } from "./admin";
 import { Login } from "./login";
 
 const login = route("/login", [
-  async ({ ctx: { user } }) => {
-    if (await isSetupNeeded()) {
-      return new Response(null, {
-        status: STATUS.Found302.code,
-        headers: {
-          Location: "/admin/setup",
-        },
-      });
-    }
-
-    if (user) {
-      return new Response(null, {
-        status: STATUS.Found302.code,
-        headers: {
-          Location: "/photos/admin",
-        },
-      });
-    }
-  },
+  requireSetup,
+  requireNoAuth("/photos/admin"),
   Login,
 ]);
 
 const admin = route("/admin", [
-  ({ ctx: { user } }) => {
-    if (!user) {
-      return new Response(null, {
-        status: STATUS.Found302.code,
-        headers: {
-          Location: "/photos/login",
-        },
-      });
-    }
-  },
+  requireAuth("/photos/login"),
   Admin,
 ]);
 
