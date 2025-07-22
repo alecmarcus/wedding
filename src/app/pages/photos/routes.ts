@@ -1,6 +1,6 @@
-import { STATUS } from "@@/constants";
 import { isSetupNeeded } from "@@/features/auth/functions";
 import { prefix, route } from "rwsdk/router";
+import { STATUS } from "@/constants";
 import { Photos } from ".";
 import { Login } from "./login";
 

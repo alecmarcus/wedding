@@ -1,40 +1,11 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useReducer,
-  useRef,
-  useState,
-} from "react";
-import { Image } from "@/app/components/Image";
-import { ONE_KiB, ONE_MiB, sec } from "@/app/constants";
-import { link } from "@/app/navigation";
-import type { Photo } from "@/db";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { sec } from "@/constants";
 import type { ActionState } from "../actions";
 import { RSVP_FIELDS } from "../fields";
 import { useRsvpAction } from "../hooks";
-import { deletePhoto } from "../photo/functions";
-
-const getFileSize = (size: number) => {
-  if (size < ONE_KiB) {
-    return {
-      mib: size / ONE_MiB,
-      labelled: `${size} bytes`,
-    };
-  }
-  if (size >= ONE_KiB && size < ONE_MiB) {
-    return {
-      mib: size / ONE_MiB,
-      labelled: `${(size / ONE_KiB).toFixed(1)} KiB`,
-    };
-  }
-  return {
-    mib: size / ONE_MiB,
-    labelled: `${(size / ONE_MiB).toFixed(1)} MiB`,
-  };
-};
+import { PhotoInput, type PhotoInputHandle } from "../photo/components/Input";
 
 type RsvpFormSuccessProps = {
   submissionType: "update" | "create";
@@ -117,9 +88,13 @@ export const RsvpForm = ({
   ]);
 
   const returnToEditing = useCallback(() => {
-    setIsEditing(true);
-    setSubmissionType("update");
-  }, []);
+    if (rsvp?.editToken) {
+      setIsEditing(true);
+      setSubmissionType("update");
+    }
+  }, [
+    rsvp?.editToken,
+  ]);
 
   useEffect(() => {
     if (isPending === false && isSuccess) {
@@ -155,113 +130,7 @@ export const RsvpForm = ({
 
   const title = submissionType === "update" ? "Edit Your RSVP" : "RSVP";
 
-  const [selectedPhotos, setSelectedPhotos] = useState<
-    {
-      src: string;
-      size: number;
-      id: null;
-      name: string;
-    }[]
-  >([]);
-  const [existingPhotos, removeExistingPhoto] = useReducer(
-    (
-      state,
-      {
-        id,
-      }: {
-        id: string;
-      }
-    ) => {
-      void deletePhoto({
-        id,
-      });
-      return state.filter(item => item.id !== id);
-    },
-    initialRsvp?.photos?.successes,
-    (photos: Photo[] | undefined) =>
-      (photos || []).map(({ fileName, id }) => ({
-        src: link("/photo/:fileName", {
-          fileName,
-        }),
-        size: null,
-        name: fileName,
-        id,
-      }))
-  );
-  const allPhotos = [
-    ...(existingPhotos || []),
-    ...selectedPhotos,
-  ];
-  const tooManyFiles = allPhotos.length > RSVP_FIELDS.photos.maxLength;
-  const someFileIsTooLarge = allPhotos.some(
-    ({ size }) => size && size > RSVP_FIELDS.photos.maxSize
-  );
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const onFileInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const files = e.target.files;
-      if (!files) {
-        return;
-      }
-
-      const selected: typeof selectedPhotos = [];
-      for (const file of files) {
-        selected.push({
-          src: URL.createObjectURL(file),
-          size: getFileSize(file.size).mib,
-          name: file.name,
-          id: null,
-        });
-      }
-
-      setSelectedPhotos(existing => {
-        // Must be done manually when no longer needed
-        // @see https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static#memory_management
-        for (const { src } of existing) {
-          URL.revokeObjectURL(src);
-        }
-
-        return selected;
-      });
-    },
-    []
-  );
-
-  const removePhoto = useCallback(
-    ({ name, id }: { name: string | null; id: string | null }) => {
-      if (id) {
-        return removeExistingPhoto({
-          id,
-        });
-      }
-
-      const input = fileInputRef.current;
-
-      if (name && input?.files) {
-        const remaining = new DataTransfer();
-        for (const existingFile of input.files) {
-          if (name !== existingFile.name) {
-            remaining.items.add(existingFile);
-          }
-        }
-        input.files = remaining.files;
-        setSelectedPhotos(existing => {
-          const remaining: typeof existing = [];
-          // Must be done manually when no longer needed
-          // @see https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static#memory_management
-          for (const existingFile of existing) {
-            if (name !== existingFile.name) {
-              remaining.push(existingFile);
-            }
-            URL.revokeObjectURL(existingFile.src);
-          }
-
-          return remaining;
-        });
-      }
-    },
-    []
-  );
+  const photoInputHandle = useRef<PhotoInputHandle>(null);
 
   if (!isEditing) {
     return (
@@ -378,43 +247,13 @@ export const RsvpForm = ({
         </label>
       </div>
 
-      <div>
-        {allPhotos?.map(({ src, size, id, name }) => {
-          const tooLarge = size && size > RSVP_FIELDS.photos.maxSize;
-          const remove = () =>
-            removePhoto({
-              name,
-              id,
-            });
-          return (
-            <div key={src}>
-              <button type="button" onClick={remove}>
-                Remove
-              </button>
-              <Image src={src} alt="Uploaded photo" />
-              {tooLarge && (
-                <span>
-                  File size {size} exceeds limit of {RSVP_FIELDS.photos.maxSize}
-                </span>
-              )}
-            </div>
-          );
-        })}
-        <label htmlFor={RSVP_FIELDS.photos.name}>
-          Upload photos
-          <input
-            type="file"
-            accept={RSVP_FIELDS.photos.mimeType.join(", ")}
-            disabled={isPending}
-            id={RSVP_FIELDS.photos.name}
-            max={RSVP_FIELDS.photos.maxLength}
-            multiple={true}
-            name={RSVP_FIELDS.photos.name}
-            onChange={onFileInputChange}
-            ref={fileInputRef}
-          />
-        </label>
-      </div>
+      <PhotoInput
+        isPending={isPending}
+        uploadedPhotos={
+          rsvp?.photos?.successes || initialRsvp?.photos?.successes || []
+        }
+        ref={photoInputHandle}
+      />
 
       {onCancelUpdating && submissionType === "update" && (
         <button type="button" disabled={isPending} onClick={onCancelUpdating}>
@@ -423,7 +262,10 @@ export const RsvpForm = ({
       )}
       <button
         type="submit"
-        disabled={isPending || someFileIsTooLarge || tooManyFiles}
+        disabled={
+          isPending ||
+          Object.values(photoInputHandle.current?.errors || []).some(e => e)
+        }
       >
         {buttonText}
       </button>

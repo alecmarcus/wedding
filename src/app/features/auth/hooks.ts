@@ -1,6 +1,6 @@
 "use client";
 
-import { type Href, navigate } from "@@/navigation";
+import { navigate, type Route } from "@@/navigation";
 import {
   startAuthentication,
   startRegistration,
@@ -13,11 +13,7 @@ import {
   startPasskeyRegistration,
 } from "./functions";
 
-export const useLoginRequest = ({
-  redirect,
-}: {
-  redirect?: Href | Href[0];
-} = {}) => {
+export const useLoginRequest = ({ redirect }: { redirect?: Route } = {}) => {
   const [error, setError] = useState<null | string>(null);
   const [isPending, startTransition] = useTransition();
   const [isSuccess, setIsSuccess] = useState(false);
@@ -38,13 +34,12 @@ export const useLoginRequest = ({
       if (success) {
         setIsSuccess(true);
         if (redirect) {
-          navigate(
-            ...((Array.isArray(redirect)
-              ? redirect
-              : [
-                  redirect,
-                ]) as Href)
-          );
+          const [path, params]: Exclude<Route, string> = Array.isArray(redirect)
+            ? redirect
+            : [
+                redirect,
+              ];
+          navigate(path, params);
         }
       } else {
         throw new Error("Unknown error");

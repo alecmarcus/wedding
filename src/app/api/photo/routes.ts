@@ -1,7 +1,7 @@
-import { STATUS } from "@@/constants";
 import { env } from "cloudflare:workers";
 import { route } from "rwsdk/router";
 import type { RequestInfo } from "rwsdk/worker";
+import { STATUS } from "@/constants";
 
 type PhotoByFileNameRequest = RequestInfo<{
   fileName: string;

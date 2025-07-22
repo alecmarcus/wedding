@@ -1,7 +1,7 @@
-import { STATUS } from "@@/constants";
 import { env } from "cloudflare:workers";
 import type { RouteMiddleware } from "rwsdk/router";
 import { ErrorResponse } from "rwsdk/worker";
+import { STATUS } from "@/constants";
 import { db, setupDb } from "@/db";
 import { setupSessionStore } from "./store";
 

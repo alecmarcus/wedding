@@ -1,18 +1,18 @@
-import { type Href, link } from "@@/navigation";
+import { link, type Route } from "@@/navigation";
 
 export const Link = ({
   to,
   children,
   ...rest
 }: {
-  to: Href | Href[0];
+  to: Route;
 } & Omit<React.ComponentPropsWithRef<"a">, "href">) => {
-  const args: Href = Array.isArray(to)
+  const [path, params]: Exclude<Route, string> = Array.isArray(to)
     ? to
     : [
         to,
       ];
-  const href = link(...args);
+  const href = link(path, params);
   return (
     <a href={href} {...rest}>
       {children}

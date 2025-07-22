@@ -1,8 +1,19 @@
 "use client";
 
-import { useActionState, useCallback, useState, useTransition } from "react";
+import {
+  useActionState,
+  useCallback,
+  useMemo,
+  useReducer,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
+import { link } from "@/app/navigation";
 import type { Photo } from "@/db";
+import { getFileSize } from "@/util/getFileSize";
 import { uploadPhotos } from "./actions";
+import { UPLOAD_PHOTOS_FIELDS } from "./fields";
 import { deletePhoto, getPhotosByRsvp } from "./functions";
 
 export const useUploadPhotosAction = (
@@ -115,4 +126,147 @@ export const useDeletePhotoRequest = () => {
       isSuccess,
     },
   ] as const;
+};
+
+export const useManagePhotos = ({
+  uploadedPhotos,
+}: {
+  uploadedPhotos: Photo[];
+}) => {
+  const [existingPhotos, removeExistingPhoto] = useReducer(
+    (
+      state,
+      {
+        id,
+      }: {
+        id: string;
+      }
+    ) => {
+      void deletePhoto({
+        id,
+      });
+      return state.filter(item => item.id !== id);
+    },
+    uploadedPhotos,
+    (photos: Photo[]) =>
+      photos.map(({ fileName, id }) => ({
+        src: link("/photo/:fileName", {
+          fileName,
+        }),
+        size: null,
+        name: fileName,
+        id,
+      }))
+  );
+  const [selectedPhotos, setSelectedPhotos] = useState<
+    {
+      src: string;
+      size: number;
+      id: null;
+      name: string;
+    }[]
+  >([]);
+  const allPhotos = useMemo(
+    () => [
+      ...existingPhotos,
+      ...selectedPhotos,
+    ],
+    [
+      existingPhotos,
+      selectedPhotos,
+    ]
+  );
+
+  const tooManyFiles = allPhotos.length > UPLOAD_PHOTOS_FIELDS.photos.maxLength;
+  const someFileIsTooLarge = allPhotos.some(
+    ({ size }) => size && size > UPLOAD_PHOTOS_FIELDS.photos.maxSize
+  );
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const inputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) {
+      return;
+    }
+
+    const selected: typeof selectedPhotos = [];
+    for (const file of files) {
+      selected.push({
+        src: URL.createObjectURL(file),
+        size: getFileSize(file.size).mib,
+        name: file.name,
+        id: null,
+      });
+    }
+
+    setSelectedPhotos(existing => {
+      // Must be done manually when no longer needed
+      // @see https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static#memory_management
+      for (const { src } of existing) {
+        URL.revokeObjectURL(src);
+      }
+
+      return selected;
+    });
+  }, []);
+
+  const removePhoto = useCallback(
+    (
+      where:
+        | {
+            name: string;
+          }
+        | {
+            id: string;
+          }
+    ) => {
+      if ("id" in where && where.id) {
+        return removeExistingPhoto(where);
+      }
+
+      const input = inputRef.current;
+
+      if ("name" in where && where.name && input?.files) {
+        const { name } = where;
+        const remaining = new DataTransfer();
+        for (const existingFile of input.files) {
+          if (name !== existingFile.name) {
+            remaining.items.add(existingFile);
+          }
+        }
+        input.files = remaining.files;
+        setSelectedPhotos(existing => {
+          const remaining: typeof existing = [];
+          // Must be done manually when no longer needed
+          // @see https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static#memory_management
+          for (const existingFile of existing) {
+            if (name !== existingFile.name) {
+              remaining.push(existingFile);
+            }
+            URL.revokeObjectURL(existingFile.src);
+          }
+
+          return remaining;
+        });
+      }
+    },
+    []
+  );
+
+  return {
+    inputRef,
+    state: {
+      allPhotos,
+      existingPhotos,
+      selectedPhotos,
+    },
+    handlers: {
+      inputChange,
+      removePhoto,
+    },
+    errors: {
+      someFileIsTooLarge,
+      tooManyFiles,
+    },
+  };
 };

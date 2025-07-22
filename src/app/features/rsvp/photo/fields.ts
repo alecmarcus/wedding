@@ -1,4 +1,4 @@
-import { mib } from "@@/constants";
+import { mib } from "@/constants";
 
 const MAX_FILE_SIZE = mib(10);
 export const MAX_PHOTOS_PER_RSVP = 20;
