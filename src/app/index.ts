@@ -1,10 +1,11 @@
 import { apiPhotoRoutes } from "@@/api/photo/routes";
+
 import { Document } from "@@/layouts/Document";
 import { adminRoutes } from "@@/pages/admin/routes";
 import { homeRoutes } from "@@/pages/home/routes";
-import { uploadRoutes } from "@@/pages/upload/routes";
 import { render } from "rwsdk/router";
 import { defineApp } from "rwsdk/worker";
+import { photosRoutes } from "@/app/pages/photos/routes";
 import type { User } from "@/db";
 import type { Session } from "@/session/durableObject";
 import { sessionMiddleware } from "@/session/middleware";
@@ -16,12 +17,17 @@ export type AppContext = {
 };
 
 export const app = defineApp([
-  setCommonHeaders(),
+  /** Middlewares */
+  setCommonHeaders,
   sessionMiddleware,
+
+  /** APIs */
+  apiPhotoRoutes,
+
+  /** Pages */
   render(Document, [
-    homeRoutes,
     adminRoutes,
-    uploadRoutes,
-    apiPhotoRoutes,
+    homeRoutes,
+    photosRoutes,
   ]),
 ]);

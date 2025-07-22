@@ -132,7 +132,7 @@ export const RsvpForm = ({
     onDoneEditing,
   ]);
 
-  const [hasPlusOne, setHasPlusOne] = useState(initialRsvp?.plusOne ?? true);
+  const [hasPlusOne, setHasPlusOne] = useState(!!initialRsvp?.plusOne);
   const handlePlusOneChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
       const isChecked = event.target.checked;
@@ -319,7 +319,7 @@ export const RsvpForm = ({
       <div>
         <label htmlFor={RSVP_FIELDS.plusOne.name}>
           <input
-            defaultChecked={rsvp?.plusOne}
+            defaultChecked={!!rsvp?.plusOne}
             disabled={isPending}
             id={RSVP_FIELDS.plusOne.name}
             name={RSVP_FIELDS.plusOne.name}

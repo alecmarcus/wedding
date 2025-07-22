@@ -1,5 +1,3 @@
-"use server";
-
 import { STATUS } from "@@/constants";
 import { env } from "cloudflare:workers";
 import { route } from "rwsdk/router";
@@ -24,6 +22,7 @@ const photoByFileName = route("/photo/:fileName", async request => {
 
     const headers = new Headers();
     object.writeHttpMetadata(headers);
+    headers.set("Content-Type", object.httpMetadata?.contentType || "image/*");
     headers.set("Cache-Control", "public, max-age=31536000");
 
     return new Response(object.body, {

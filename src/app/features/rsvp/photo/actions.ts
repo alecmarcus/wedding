@@ -102,7 +102,11 @@ export const uploadPhotos = async (
       const fileName = `${randomString}.${extension}`;
 
       try {
-        await env.PHOTOS.put(fileName, file);
+        await env.PHOTOS.put(fileName, file, {
+          httpMetadata: {
+            contentType: file.type,
+          },
+        });
         const photo = await db.photo.create({
           data: {
             fileName,

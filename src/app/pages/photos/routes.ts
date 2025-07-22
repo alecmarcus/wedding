@@ -1,7 +1,7 @@
 import { STATUS } from "@@/constants";
 import { isSetupNeeded } from "@@/features/auth/functions";
 import { prefix, route } from "rwsdk/router";
-import { UploadPage } from ".";
+import { Photos } from ".";
 import { Login } from "./login";
 
 const login = route("/login", [
@@ -19,7 +19,7 @@ const login = route("/login", [
       return new Response(null, {
         status: STATUS.Found302.code,
         headers: {
-          Location: "/upload/admin",
+          Location: "/photos/admin",
         },
       });
     }
@@ -33,17 +33,17 @@ const admin = route("/admin", [
       return new Response(null, {
         status: STATUS.Found302.code,
         headers: {
-          Location: "/upload/login",
+          Location: "/photos/login",
         },
       });
     }
   },
-  UploadPage,
+  Photos,
 ]);
 
-const index = route("/:token", UploadPage);
+const index = route("/:token", Photos);
 
-export const uploadRoutes = prefix("/upload", [
+export const photosRoutes = prefix("/photos", [
   login,
   admin,
   index,
