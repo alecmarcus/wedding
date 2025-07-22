@@ -70,3 +70,8 @@ coverage
 generated/
 
 .turbo
+
+*.woff
+*.woff2
+*.ttf
+*.otf
