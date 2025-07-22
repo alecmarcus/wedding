@@ -1,57 +1,6 @@
 "use server";
 
 import { db } from "@/db";
-import type { ActionState } from "./actions";
-
-export const getRsvpByEditToken = async ({
-  editToken,
-}: {
-  editToken: string;
-}): Promise<ActionState> => {
-  try {
-    if (!editToken) {
-      throw new Error("Invalid edit token");
-    }
-
-    const rsvp = await db.rsvp.findUniqueOrThrow({
-      where: {
-        editToken,
-      },
-    });
-
-    const photos = await db.photo.findMany({
-      where: {
-        rsvpId: rsvp.id,
-      },
-    });
-
-    return {
-      data: {
-        ...rsvp,
-        photos: {
-          failureCount: 0,
-          failures: [],
-          successCount: photos.length,
-          total: photos.length,
-          successes: photos,
-        },
-      },
-      error: null,
-      isSuccess: true,
-    };
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error
-        ? error.message
-        : JSON.stringify(error) || "Failed to fetch RSVP.";
-
-    return {
-      data: null,
-      error: errorMessage,
-      isSuccess: false,
-    };
-  }
-};
 
 export const getRsvpStats = async () => {
   const rsvpCount = await db.rsvp.count();

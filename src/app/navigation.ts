@@ -63,9 +63,9 @@ const routes = [
   "/admin/logout",
   "/admin/setup",
   "/photo/:fileName",
-  "/photos/:token",
   "/rsvp",
   "/rsvp/:token",
+  "/upload/:token",
 ] as const;
 
 type Routes = typeof routes;

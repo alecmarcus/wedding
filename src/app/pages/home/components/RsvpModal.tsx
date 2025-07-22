@@ -1,23 +1,15 @@
 import { RsvpForm } from "@@/features/rsvp/components/Form";
 import { Suspense } from "react";
 import { Link } from "@/app/components/Link";
-import { getRsvpByEditToken } from "@/app/features/rsvp/functions";
+import type { Photo, Rsvp } from "@/db";
 
-export const RsvpModal = async ({ token }: { token?: string }) => {
-  let rsvp: Awaited<ReturnType<typeof getRsvpByEditToken>>["data"] = null;
-  let error: string | null = null;
-
-  if (token) {
-    const result = await getRsvpByEditToken({
-      editToken: token,
-    });
-    if (result.error) {
-      error = result.error;
-    } else {
-      rsvp = result.data;
-    }
-  }
-
+export const RsvpModal = ({
+  rsvp,
+  photos,
+}: {
+  rsvp: Rsvp | null;
+  photos: Photo[];
+}) => {
   return (
     <Suspense fallback="Loading RSVP...">
       <Link
@@ -41,7 +33,7 @@ export const RsvpModal = async ({ token }: { token?: string }) => {
           backgroundColor: "white",
         }}
       >
-        <RsvpForm rsvp={rsvp} error={error} />
+        <RsvpForm rsvp={rsvp} photos={photos} />
       </div>
     </Suspense>
   );

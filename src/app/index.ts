@@ -5,7 +5,7 @@ import { adminRoutes } from "@@/pages/admin/routes";
 import { homeRoutes } from "@@/pages/home/routes";
 import { render } from "rwsdk/router";
 import { defineApp } from "rwsdk/worker";
-import { photosRoutes } from "@/app/pages/photos/routes";
+import { uploadRoutes } from "@/app/pages/upload/routes";
 import type { User } from "@/db";
 import type { Session } from "@/session/durableObject";
 import { sessionMiddleware } from "@/session/middleware";
@@ -28,6 +28,6 @@ export const app = defineApp([
   render(Document, [
     adminRoutes,
     homeRoutes,
-    photosRoutes,
+    uploadRoutes,
   ]),
 ]);

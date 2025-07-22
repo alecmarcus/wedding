@@ -1,16 +1,16 @@
 // "use client";
-import type { RequestInfo } from "rwsdk/worker";
+// import type { RequestInfo } from "rwsdk/worker";
 
-type PhotosByTokenRequest = RequestInfo<{
-  token?: string;
-}>;
+// type UploadsByTokenRequest = RequestInfo<{
+//   token?: string;
+// }>;
 
-export const Photos = (
+export const Upload = (
   // request: RequestInfo
 ) => {
   // const {
   //   params: { token },
-  // } = request as PhotosByTokenRequest;
+  // } = request as UploadsByTokenRequest;
   return <h1>Wip</h1>;
   // return <RsvpModal token={token} />;
 };

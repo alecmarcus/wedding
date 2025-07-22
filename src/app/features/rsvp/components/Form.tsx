@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { sec } from "@/constants";
-import type { ActionState } from "../actions";
+import type { Photo, Rsvp } from "@/db";
 import { RSVP_FIELDS } from "../fields";
 import { useRsvpAction } from "../hooks";
 import { PhotoInput, type PhotoInputHandle } from "../photo/components/Input";
@@ -49,20 +49,31 @@ const RsvpFormSuccess = ({
 
 export const RsvpForm = ({
   rsvp: initialRsvp,
-  error: initialError,
+  photos: initialPhotos,
   onDoneEditing,
   onCancelUpdating,
 }: {
-  rsvp: ActionState["data"];
+  rsvp: Rsvp | null;
+  photos: Photo[];
   onDoneEditing?: () => void;
   onCancelUpdating?: () => void;
-  error: string | null;
 }) => {
   const ref = useRef<HTMLFormElement>(null);
 
   const [rsvpAction, { isSuccess, isPending, error, data: rsvp }] =
     useRsvpAction({
-      data: initialRsvp,
+      data: initialRsvp
+        ? {
+            ...initialRsvp,
+            photos: {
+              failureCount: 0,
+              failures: [],
+              successCount: initialPhotos.length,
+              successes: initialPhotos,
+              total: initialPhotos.length,
+            },
+          }
+        : null,
       error: null,
       isSuccess: null,
     });
@@ -74,8 +85,8 @@ export const RsvpForm = ({
 
   const [shownError, setShownError] = useState<string | null>(null);
   useEffect(() => {
-    if (error || initialError) {
-      setShownError(error || initialError);
+    if (error) {
+      setShownError(error);
       const timeout = setTimeout(() => {
         setShownError(null);
       }, sec(3));
@@ -84,7 +95,6 @@ export const RsvpForm = ({
     }
   }, [
     error,
-    initialError,
   ]);
 
   const returnToEditing = useCallback(() => {
