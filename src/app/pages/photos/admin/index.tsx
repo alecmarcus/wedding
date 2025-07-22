@@ -1,6 +1,6 @@
 import { Suspense } from "react";
-import { PhotoForm } from "@/app/features/rsvp/photo/components/Form";
 import { db } from "@/db";
+import { AdminPhotoForm } from "./PhotoForm";
 import { PhotoGroup } from "./PhotoGroup";
 
 export const Admin = async () => {
@@ -13,7 +13,6 @@ export const Admin = async () => {
   const allPhotos = await db.rsvp.findMany({
     select: {
       name: true,
-      uploadToken: true,
       photos: true,
     },
     where: {
@@ -29,12 +28,12 @@ export const Admin = async () => {
   return (
     <Suspense fallback="Loading all photos...">
       <h1>Admin</h1>
-      <PhotoForm uploadedPhotos={adminPhotos} uploadToken="" />
-      {allPhotos.map(({ name, uploadToken, photos }) => {
+      <AdminPhotoForm uploadedPhotos={adminPhotos} />
+      {allPhotos.map(({ name, photos }) => {
         return (
           <div key={name}>
             <h1>{name}</h1>
-            <PhotoGroup photos={photos} uploadToken={uploadToken} />
+            <PhotoGroup photos={photos} />
           </div>
         );
       })}

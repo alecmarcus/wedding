@@ -45,6 +45,41 @@ export const getPhotosByRsvp = async (
   }
 };
 
+export const deletePhotoAdmin = async (
+  where:
+    | {
+        id: string;
+      }
+    | {
+        fileName: string;
+      }
+) => {
+  try {
+    const photo = await db.photo.findUniqueOrThrow({
+      where,
+    });
+
+    await Promise.allSettled([
+      env.PHOTOS.delete(photo.fileName),
+      db.photo.delete({
+        where,
+      }),
+    ]);
+
+    return {
+      error: null,
+      isSuccess: true,
+    };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    return {
+      error: errorMessage,
+      isSuccess: false,
+    };
+  }
+};
+
 export const deletePhoto = async (
   identifier:
     | {

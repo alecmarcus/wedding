@@ -1,5 +1,6 @@
 "use client";
 
+import { link } from "@@/navigation";
 import {
   useActionState,
   useCallback,
@@ -9,10 +10,9 @@ import {
   useState,
   useTransition,
 } from "react";
-import { link } from "@/app/navigation";
 import type { Photo } from "@/db";
 import { getFileSize } from "@/util/getFileSize";
-import { uploadPhotos } from "./actions";
+import { uploadPhotos, uploadPhotosAdmin } from "./actions";
 import { UPLOAD_PHOTOS_FIELDS } from "./fields";
 import { deletePhoto, getPhotosByRsvp } from "./functions";
 
@@ -20,6 +20,20 @@ export const useUploadPhotosAction = (
   initial: Parameters<typeof uploadPhotos>[0]
 ) => {
   const [state, action, isPending] = useActionState(uploadPhotos, initial);
+
+  return [
+    action,
+    {
+      ...state,
+      isPending,
+    },
+  ] as const;
+};
+
+export const useAdminUploadPhotosAction = (
+  initial: Parameters<typeof uploadPhotosAdmin>[0]
+) => {
+  const [state, action, isPending] = useActionState(uploadPhotosAdmin, initial);
 
   return [
     action,

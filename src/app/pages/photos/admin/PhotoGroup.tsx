@@ -1,26 +1,15 @@
 "use client";
 
 import { Image } from "@@/components/Image";
-import { deletePhoto } from "@@/features/rsvp/photo/functions";
+import { deletePhotoAdmin } from "@@/features/rsvp/photo/functions";
 import { link } from "@@/navigation";
 import type { Photo } from "@/db";
 
-const PhotoGroupItem = ({
-  id,
-  fileName,
-  uploadToken,
-}: Photo & {
-  uploadToken: string;
-}) => {
+const PhotoGroupItem = ({ id, fileName }: Photo) => {
   const remove = () => {
-    void deletePhoto(
-      {
-        id,
-      },
-      {
-        uploadToken,
-      }
-    );
+    void deletePhotoAdmin({
+      id,
+    });
   };
 
   const src = link("/photo/:fileName", {
@@ -37,14 +26,6 @@ const PhotoGroupItem = ({
   );
 };
 
-export const PhotoGroup = ({
-  photos,
-  uploadToken,
-}: {
-  photos: Photo[];
-  uploadToken: string;
-}) => {
-  return photos.map(photo => (
-    <PhotoGroupItem {...photo} key={photo.id} uploadToken={uploadToken} />
-  ));
+export const PhotoGroup = ({ photos }: { photos: Photo[] }) => {
+  return photos.map(photo => <PhotoGroupItem {...photo} key={photo.id} />);
 };
