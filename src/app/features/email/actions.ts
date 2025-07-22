@@ -51,6 +51,11 @@ export const sendBulkEmail = async (
       select: {
         email: true,
       },
+      where: {
+        attending: {
+          equals: true,
+        },
+      },
     });
 
     if (recipients.length === 0) {
