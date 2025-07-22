@@ -20,6 +20,7 @@ CREATE TABLE "Credential" (
 CREATE TABLE "Rsvp" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "name" TEXT NOT NULL,
+    "attending" BOOLEAN NOT NULL,
     "email" TEXT NOT NULL,
     "plusOne" BOOLEAN NOT NULL DEFAULT false,
     "plusOneName" TEXT,
@@ -73,13 +74,19 @@ CREATE INDEX "Rsvp_editToken_idx" ON "Rsvp"("editToken");
 CREATE INDEX "Rsvp_uploadToken_idx" ON "Rsvp"("uploadToken");
 
 -- CreateIndex
+CREATE INDEX "Rsvp_attending_idx" ON "Rsvp"("attending");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Photo_fileName_key" ON "Photo"("fileName");
+
+-- CreateIndex
 CREATE INDEX "Photo_createdAt_idx" ON "Photo"("createdAt");
 
 -- CreateIndex
 CREATE INDEX "Photo_fileName_idx" ON "Photo"("fileName");
 
 -- CreateIndex
-CREATE INDEX "Photo_uploaderName_idx" ON "Photo"("uploaderName");
+CREATE INDEX "Photo_rsvpId_idx" ON "Photo"("rsvpId");
 
 -- CreateIndex
-CREATE INDEX "Photo_rsvpId_idx" ON "Photo"("rsvpId");
+CREATE INDEX "Photo_uploaderName_idx" ON "Photo"("uploaderName");

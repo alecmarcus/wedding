@@ -45,6 +45,7 @@ model Credential {
 model Rsvp {
   id                  String   @id @default(uuid())
   name                String
+  attending           Boolean
   email               String
   plusOne             Boolean  @default(false)
   plusOneName         String?
@@ -60,6 +61,7 @@ model Rsvp {
   @@index([email])
   @@index([editToken])
   @@index([uploadToken])
+  @@index([attending])
 }
 
 model Photo {
