@@ -9,6 +9,9 @@ export const RSVP_FIELDS = {
     name: "name",
     max: MAX_NAME,
   },
+  attending: {
+    name: "attending",
+  },
   email: {
     name: "email",
     max: MAX_NAME,

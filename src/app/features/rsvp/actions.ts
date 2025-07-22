@@ -21,6 +21,7 @@ import { type UploadPhotosResponse, uploadPhotos } from "./photo/actions";
 
 const rsvpSchema = object({
   name: pipe(string(), maxLength(RSVP_FIELDS.name.max)),
+  attending: boolean(),
   email: pipe(string(), email(), maxLength(RSVP_FIELDS.email.max)),
   plusOne: boolean(),
   plusOneName: nullable(pipe(string(), maxLength(RSVP_FIELDS.plusOneName.max))),
@@ -36,6 +37,7 @@ const parseAndValidateFormData = (formData: FormData) => {
   const rawData = {
     name: formData.get(RSVP_FIELDS.name.name) as string,
     email: formData.get(RSVP_FIELDS.email.name) as string,
+    attending: !!formData.get(RSVP_FIELDS.attending.name),
     plusOne,
     plusOneName: plusOne
       ? (formData.get(RSVP_FIELDS.plusOneName.name) as string)

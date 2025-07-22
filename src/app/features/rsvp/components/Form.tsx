@@ -117,6 +117,15 @@ export const RsvpForm = ({
     onDoneEditing,
   ]);
 
+  const [attending, setAttending] = useState(!!initialRsvp?.attending);
+  const handleAttendingChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      const isChecked = event.target.checked;
+      setAttending(isChecked);
+    },
+    []
+  );
+
   const [hasPlusOne, setHasPlusOne] = useState(!!initialRsvp?.plusOne);
   const handlePlusOneChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,10 +205,28 @@ export const RsvpForm = ({
       </div>
 
       <div>
+        <label htmlFor={RSVP_FIELDS.attending.name}>
+          <input
+            defaultChecked={rsvp?.attending ?? false}
+            disabled={isPending}
+            id={RSVP_FIELDS.attending.name}
+            name={RSVP_FIELDS.attending.name}
+            onChange={handleAttendingChange}
+            type="checkbox"
+          />
+          Will you be joining us?
+        </label>
+      </div>
+
+      <div
+        style={{
+          display: attending ? "block" : "none",
+        }}
+      >
         <label htmlFor={RSVP_FIELDS.plusOne.name}>
           <input
-            defaultChecked={!!rsvp?.plusOne}
-            disabled={isPending}
+            defaultChecked={rsvp?.plusOne ?? false}
+            disabled={isPending || attending === false}
             id={RSVP_FIELDS.plusOne.name}
             name={RSVP_FIELDS.plusOne.name}
             onChange={handlePlusOneChange}
@@ -211,7 +238,7 @@ export const RsvpForm = ({
 
       <div
         style={{
-          display: hasPlusOne ? "block" : "none",
+          display: attending && hasPlusOne ? "block" : "none",
         }}
       >
         <label htmlFor={RSVP_FIELDS.plusOneName.name}>
@@ -229,7 +256,11 @@ export const RsvpForm = ({
         </label>
       </div>
 
-      <div>
+      <div
+        style={{
+          display: attending ? "block" : "none",
+        }}
+      >
         <label htmlFor={RSVP_FIELDS.dietaryRestrictions.name}>
           Dietary Restrictions
           <textarea
@@ -259,9 +290,7 @@ export const RsvpForm = ({
 
       <PhotoInput
         isPending={isPending}
-        uploadedPhotos={
-          rsvp?.photos?.successes || initialRsvp?.photos?.successes || []
-        }
+        uploadedPhotos={rsvp?.photos?.successes || initialPhotos || []}
         editToken={rsvp?.editToken}
         ref={photoInputHandle}
       />
