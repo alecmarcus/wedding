@@ -9,22 +9,8 @@
   "files": {
     "ignoreUnknown": true,
     "includes": [
-      "./**/*.js",
-      "./**/*.jsx",
-      "./**/*.ts",
-      "./**/*.tsx",
-      "./**/*.json",
-      "!./package.json",
-      "!**/.wrangler/**",
-      "!**/dist/**",
-      "!**/generated/**",
-      "!**/node_modules/**",
-      "!./generated/**",
-      "!bun.lock",
-      "!rws.d.ts",
-      "!rwsdk.d.ts",
-      "!vite.d.ts",
-      "!worker-configuration.d.ts"
+      "**",
+      "!**/dist/**"
     ]
   },
   "assist": {
@@ -37,22 +23,9 @@
   },
   "formatter": {
     "includes": [
-      "./**/*.js",
-      "./**/*.jsx",
-      "./**/*.ts",
-      "./**/*.tsx",
-      "./**/*.json",
-      "!./package.json",
-      "!**/.wrangler/**",
-      "!**/dist/**",
-      "!**/generated/**",
-      "!**/node_modules/**",
+      "!./.wrangler/**",
       "!./generated/**",
-      "!bun.lock",
-      "!rws.d.ts",
-      "!rwsdk.d.ts",
-      "!vite.d.ts",
-      "!worker-configuration.d.ts"
+      "!./migrations/**"
     ],
     "enabled": true,
     "indentStyle": "space",
@@ -60,24 +33,6 @@
     "expand": "always"
   },
   "linter": {
-    "includes": [
-      "./**/*.js",
-      "./**/*.jsx",
-      "./**/*.ts",
-      "./**/*.tsx",
-      "./**/*.json",
-      "!./package.json",
-      "!**/.wrangler/**",
-      "!**/dist/**",
-      "!**/generated/**",
-      "!**/node_modules/**",
-      "!./generated/**",
-      "!bun.lock",
-      "!rws.d.ts",
-      "!rwsdk.d.ts",
-      "!vite.d.ts",
-      "!worker-configuration.d.ts"
-    ],
     "enabled": true,
     "rules": {
       "recommended": true,
@@ -121,22 +76,7 @@
   "overrides": [
     {
       "includes": [
-        "./**/*.js",
-        "./**/*.jsx",
-        "./**/*.ts",
-        "./**/*.tsx",
-        "./**/*.json",
-        "!./package.json",
-        "!**/.wrangler/**",
-        "!**/dist/**",
-        "!**/generated/**",
-        "!**/node_modules/**",
-        "!./generated/**",
-        "!bun.lock",
-        "!rws.d.ts",
-        "!rwsdk.d.ts",
-        "!vite.d.ts",
-        "!worker-configuration.d.ts"
+        "**"
       ],
       "linter": {
         "rules": {
@@ -158,6 +98,22 @@
             "noConsole": "warn",
             "noReactSpecificProps": "off"
           }
+        }
+      }
+    },
+    {
+      "includes": [
+        "./worker-configuration.d.ts",
+        "./rwsdk.d.ts",
+        "./rw.d.ts"
+      ],
+      "linter": {
+        "rules": {
+          "nursery": "off",
+          "suspicious": "off",
+          "correctness": "off",
+          "complexity": "off",
+          "style": "off"
         }
       }
     }

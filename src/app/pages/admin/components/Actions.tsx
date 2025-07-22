@@ -3,7 +3,7 @@
 import type { ActionState } from "@@/features/email/actions";
 import { BULK_SEND_FIELDS } from "@@/features/email/fields";
 import { useBulkEmailAction } from "@@/features/email/hooks";
-import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const Summary = ({
   successCount,
