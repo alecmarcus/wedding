@@ -8,7 +8,7 @@ import {
 } from "@/app/features/rsvp/photo/components/Input";
 import type { Photo } from "@/db";
 
-export const AdminPhotoForm = ({
+export const AdminPhotosForm = ({
   uploadedPhotos,
 }: {
   uploadedPhotos: Photo[];

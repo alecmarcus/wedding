@@ -1,8 +1,15 @@
-import { getAllRsvpsWithPhotos } from "@@/features/rsvp/functions";
-import { RsvpItem } from "./RsvpItem";
+import { db } from "@/db";
+import { RsvpItem } from "./Item";
 
 export const Rsvps = async () => {
-  const rsvps = await getAllRsvpsWithPhotos();
+  const rsvps = await db.rsvp.findMany({
+    include: {
+      photos: {},
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
 
   return (
     <div>

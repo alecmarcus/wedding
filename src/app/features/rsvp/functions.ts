@@ -3,17 +3,6 @@
 import { db } from "@/db";
 import type { ActionState } from "./actions";
 
-export const getAllRsvpsWithPhotos = async () => {
-  return await db.rsvp.findMany({
-    include: {
-      photos: {},
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
-};
-
 export const getRsvpByEditToken = async ({
   editToken,
 }: {

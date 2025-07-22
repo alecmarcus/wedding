@@ -1,6 +1,7 @@
 import { Link } from "@@/components/Link";
 import { Actions } from "./components/Actions";
-import { Rsvps } from "./components/Rsvps";
+import { Photos } from "./components/Photos";
+import { Rsvps } from "./components/Rsvp";
 import { Stats } from "./components/Stats";
 
 export const Admin = () => {
@@ -18,6 +19,7 @@ export const Admin = () => {
 
       <Stats />
       <Actions />
+      <Photos />
       <Rsvps />
     </div>
   );

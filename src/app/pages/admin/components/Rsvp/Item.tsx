@@ -1,55 +1,12 @@
 "use client";
 
-import { Image } from "@@/components/Image";
 import { useResendConfirmationRequest } from "@@/features/email/hooks";
 import { RsvpForm } from "@@/features/rsvp/components/Form";
 import { useDeleteRsvpRequest } from "@@/features/rsvp/hooks";
-import { useDeletePhotoRequest } from "@@/features/rsvp/photo/hooks";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { link } from "@/app/navigation";
 import { sec } from "@/constants";
 import type { Photo, Rsvp } from "@/db";
-
-const PhotoItem = ({
-  id,
-  fileName,
-  createdAt,
-  uploaderName,
-}: Pick<Photo, "id" | "fileName" | "createdAt" | "uploaderName">) => {
-  const [deletePhoto, { isPending: isDeletingPhoto }] = useDeletePhotoRequest();
-
-  const handleDeletePhoto = useCallback(() => {
-    if (window.confirm("Are you sure you want to delete this photo?")) {
-      deletePhoto({
-        id,
-      });
-    }
-  }, [
-    deletePhoto,
-    id,
-  ]);
-
-  return (
-    <div key={id}>
-      <Image
-        src={link("/photo/:fileName", {
-          fileName,
-        })}
-        alt={`Uploaded by ${uploaderName}`}
-      />
-      <p>
-        Uploaded on {new Date(createdAt).toLocaleDateString()} by {uploaderName}
-      </p>
-      <button
-        type="button"
-        onClick={handleDeletePhoto}
-        disabled={isDeletingPhoto}
-      >
-        {isDeletingPhoto ? "Deleting..." : "Delete Photo"}
-      </button>
-    </div>
-  );
-};
+import { PhotoGroup } from "./Photos";
 
 export const RsvpItem = ({
   rsvp,
@@ -188,15 +145,7 @@ export const RsvpItem = ({
         <RsvpForm
           rsvp={{
             ...rsvp,
-            photos: photos
-              ? {
-                  successes: photos,
-                  failures: [],
-                  failureCount: 0,
-                  successCount: photos.length,
-                  total: photos.length,
-                }
-              : null,
+            photos: null,
           }}
           onDoneEditing={toggleIsEditing}
           error={null}
@@ -205,17 +154,7 @@ export const RsvpItem = ({
       )}
 
       {showPhotos && photos && photos.length > 0 && (
-        <div>
-          {photos.map(({ id, fileName, createdAt, uploaderName }) => (
-            <PhotoItem
-              key={id}
-              id={id}
-              fileName={fileName}
-              createdAt={createdAt}
-              uploaderName={uploaderName}
-            />
-          ))}
-        </div>
+        <PhotoGroup photos={photos} uploadToken={rsvp.uploadToken} />
       )}
     </div>
   );

@@ -64,9 +64,6 @@ const routes = [
   "/admin/setup",
   "/photo/:fileName",
   "/photos/:token",
-  "/photos/:token",
-  "/photos/admin",
-  "/photos/login",
   "/rsvp",
   "/rsvp/:token",
 ] as const;
