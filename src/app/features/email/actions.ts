@@ -1,6 +1,14 @@
 "use server";
 
-import { maxLength, object, parse, pipe, string } from "valibot";
+import {
+  literal,
+  maxLength,
+  object,
+  parse,
+  pipe,
+  string,
+  union,
+} from "valibot";
 import { db } from "@/db";
 import { BULK_SEND_FIELDS } from "./fields";
 import { sendEmail } from "./functions";
@@ -8,12 +16,18 @@ import { sendEmail } from "./functions";
 const bulkEmailSchema = object({
   content: pipe(string(), maxLength(BULK_SEND_FIELDS.content.max)),
   subject: pipe(string(), maxLength(BULK_SEND_FIELDS.subject.max)),
+  attending: union([
+    literal("true"),
+    literal("false"),
+    literal("null"),
+  ]),
 });
 
 const parseAndValidateFormData = ({ formData }: { formData: FormData }) => {
   const rawData = {
     content: formData.get(BULK_SEND_FIELDS.content.name) as string,
     subject: formData.get(BULK_SEND_FIELDS.subject.name) as string,
+    attending: formData.get(BULK_SEND_FIELDS.attending.name) as string,
   };
 
   return parse(bulkEmailSchema, rawData);
@@ -43,7 +57,7 @@ export const sendBulkEmail = async (
   formData: FormData
 ): Promise<ActionState> => {
   try {
-    const { subject, content } = parseAndValidateFormData({
+    const { subject, content, attending } = parseAndValidateFormData({
       formData,
     });
 
@@ -51,11 +65,13 @@ export const sendBulkEmail = async (
       select: {
         email: true,
       },
-      where: {
-        attending: {
-          equals: true,
+      ...(attending !== "null" && {
+        where: {
+          attending: {
+            equals: attending === "true",
+          },
         },
-      },
+      }),
     });
 
     if (recipients.length === 0) {

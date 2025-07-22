@@ -3,6 +3,9 @@ export const BULK_SEND_FIELDS = {
     name: "subject",
     max: 80,
   },
+  attending: {
+    name: "attending",
+  },
   content: {
     name: "content",
     max: 1000,

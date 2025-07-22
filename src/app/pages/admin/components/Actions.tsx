@@ -39,8 +39,6 @@ const BulkEmailForm = ({
   onSubmit?: (status: ActionState) => void;
 }) => {
   const ref = useRef<HTMLFormElement>(null);
-  const subjectId = useId();
-  const contentId = useId();
 
   const [bulkEmailAction, { isPending, isSuccess, error, data }] =
     useBulkEmailAction({
@@ -70,11 +68,11 @@ const BulkEmailForm = ({
       <form ref={ref} action={bulkEmailAction}>
         <h3>Send Bulk Email to All Guests</h3>
 
-        <label htmlFor={subjectId}>
+        <label htmlFor={BULK_SEND_FIELDS.subject.name}>
           Subject *
           <input
             type="text"
-            id={subjectId}
+            id={BULK_SEND_FIELDS.subject.name}
             name={BULK_SEND_FIELDS.subject.name}
             maxLength={BULK_SEND_FIELDS.subject.max}
             required={true}
@@ -82,10 +80,47 @@ const BulkEmailForm = ({
           />
         </label>
 
-        <label htmlFor={contentId}>
+        <div>
+          Filter by *
+          <label htmlFor={`${BULK_SEND_FIELDS.attending.name}true`}>
+            <input
+              type="radio"
+              id={`${BULK_SEND_FIELDS.attending.name}true`}
+              value="true"
+              name={BULK_SEND_FIELDS.attending.name}
+              required={true}
+              disabled={isPending}
+            />
+            Attending
+          </label>
+          <label htmlFor={`${BULK_SEND_FIELDS.attending.name}false`}>
+            <input
+              type="radio"
+              id={`${BULK_SEND_FIELDS.attending.name}false`}
+              value="false"
+              name={BULK_SEND_FIELDS.attending.name}
+              required={true}
+              disabled={isPending}
+            />
+            Not Attending
+          </label>
+          <label htmlFor={`${BULK_SEND_FIELDS.attending.name}null`}>
+            <input
+              type="radio"
+              id={`${BULK_SEND_FIELDS.attending.name}null`}
+              value="null"
+              name={BULK_SEND_FIELDS.attending.name}
+              required={true}
+              disabled={isPending}
+            />
+            All
+          </label>
+        </div>
+
+        <label htmlFor={BULK_SEND_FIELDS.content.name}>
           Email Content *
           <textarea
-            id={contentId}
+            id={BULK_SEND_FIELDS.content.name}
             name={BULK_SEND_FIELDS.content.name}
             maxLength={BULK_SEND_FIELDS.content.max}
             rows={10}
