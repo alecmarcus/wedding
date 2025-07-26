@@ -43,7 +43,7 @@
   "r2_buckets": [
     {
       "binding": "PHOTOS",
-      "bucket_name": "wedding-photos",
+      "bucket_name": "wedding-photos"
     }
   ]
 }

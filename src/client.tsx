@@ -54,4 +54,5 @@ const transport: Transport = transportContext => {
 void initClient({
   transport,
 });
+
 initClientNavigation();

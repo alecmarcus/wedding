@@ -3,7 +3,7 @@
 type mixed = unknown;
 type ReactClientValue = unknown;
 type ReactServerValue = unknown;
-type Thenable<T extends (...a: any) => any> = Promise<ReturnType<T>>
+type Thenable<T extends (...a: any) => any> = Promise<ReturnType<T>>;
 
 /**
  * Represents an entry in the React Server Components import manifest.
@@ -112,7 +112,6 @@ declare module "react-server-dom-webpack/client" {
     value: ReactServerValue
   ): Promise<string | URLSearchParams | FormData>;
 }
-
 
 // From https://github.com/hi-ogawa/vite-plugins/blob/ca3f97ec09c2549d98779acbf9a24e97706c125d/packages/react-server/src/types/react-lib.d.ts#L64-L87
 // https://github.com/facebook/react/blob/89021fb4ec9aa82194b0788566e736a4cedfc0e4/packages/react-server-dom-webpack/src/ReactFlightDOMClientBrowser.js
