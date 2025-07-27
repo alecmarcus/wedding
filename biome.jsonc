@@ -34,6 +34,12 @@
     "expand": "always"
   },
   "linter": {
+    "domains": {
+      "react": "recommended",
+      "next": "none",
+      "solid": "none",
+      "vue": "none"
+    },
     "rules": {
       "recommended": true,
       "a11y": "on",
