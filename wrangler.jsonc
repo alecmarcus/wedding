@@ -22,8 +22,7 @@
     ]
   },
   "vars": {
-    "WEBAUTHN_APP_NAME": "Wedding Admin",
-    "FROM_EMAIL": "Soyeon & Alec <noreply@soyeonmarried.alecmarc.us>"
+    "WEBAUTHN_APP_NAME": "Wedding Admin"
   },
   "migrations": [
     {
