@@ -4,15 +4,16 @@ import { redwood } from "rwsdk/vite";
 import { defineConfig } from "vite";
 
 export default defineConfig({
+  environments: {
+    ssr: {},
+  },
   plugins: [
-    vanillaExtractPlugin({
-      unstable_mode: "inlineCssInDev",
-    }),
     cloudflare({
       viteEnvironment: {
         name: "worker",
       },
     }),
     redwood(),
+    vanillaExtractPlugin(),
   ],
 });

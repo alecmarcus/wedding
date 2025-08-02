@@ -1,3 +1,5 @@
+import reset from "../../css/reset.css?url";
+
 const TITLE = "Soyeon & Alec";
 
 const ROOT_ID = "root";
@@ -11,6 +13,7 @@ export const Document = ({ children }: { children: React.ReactNode }) => {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <title>{TITLE}</title>
         <link rel="modulepreload" href={CLIENT_SCRIPT} />
+        <link rel="stylesheet" href={reset} />
       </head>
       <body>
         <div id={ROOT_ID}>{children}</div>
