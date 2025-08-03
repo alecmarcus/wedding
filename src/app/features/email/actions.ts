@@ -11,7 +11,7 @@ import {
 } from "valibot";
 import { db } from "@/db";
 import { BULK_SEND_FIELDS } from "./fields";
-import { sendEmail } from "./functions";
+import { sendArbitraryEmail } from "./functions";
 
 const bulkEmailSchema = object({
   content: pipe(string(), maxLength(BULK_SEND_FIELDS.content.max)),
@@ -78,39 +78,13 @@ export const sendBulkEmail = async (
       throw new Error("No RSVPs found");
     }
 
-    const html = `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        ${content}
-      </div>
-    `;
-
-    const emails = recipients.map(async ({ email }) => {
-      try {
-        const result = await sendEmail({
-          html,
-          subject,
-          text: content.replace(/<[^>]*>/g, ""),
-          to: email,
-        });
-
-        return {
-          data: result,
-          error: null,
-          isSuccess: true,
-          recipient: email,
-        };
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-
-        return {
-          data: null,
-          error: errorMessage,
-          isSuccess: false,
-          recipient: email,
-        };
-      }
-    });
+    const emails = recipients.map(async ({ email }) =>
+      sendArbitraryEmail({
+        recipient: email,
+        subject,
+        text: content,
+      })
+    );
 
     const results = await Promise.allSettled(emails);
 
