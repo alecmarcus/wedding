@@ -1,7 +1,7 @@
 /* Visit https://aka.ms/tsconfig.json to read more about this file */
 {
   "compilerOptions": {
-    "target": "es2021",
+    "target": "ESNext",
     "lib": [
       "DOM",
       "DOM.Iterable",
@@ -9,7 +9,7 @@
       "ES2022"
     ],
     "jsx": "react-jsx",
-    "module": "es2022",
+    "module": "ESNext",
     "moduleResolution": "bundler",
     "types": [
       "./worker-configuration.d.ts",
