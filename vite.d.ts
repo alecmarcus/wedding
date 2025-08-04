@@ -1,4 +1,9 @@
 declare module "*?url" {
-  const result: string;
-  export default result;
+  const content: string;
+  export default content;
+}
+
+declare module "*.css" {
+  const content: string;
+  export default content;
 }

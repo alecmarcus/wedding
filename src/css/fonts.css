@@ -1,0 +1,10 @@
+@layer consts {
+  @font-face {
+    font-family: "Phantom";
+    src: local("Phantom");
+  }
+
+  :root {
+    --ff-phantom: "Phantom";
+  }
+}

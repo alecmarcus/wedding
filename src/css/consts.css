@@ -1,0 +1,123 @@
+/** Not to be customized */
+@layer consts {
+  :root {
+    --step-up-1: pow(var(--ratio), 1);
+    --step-up-2: pow(var(--ratio), 2);
+    --step-up-3: pow(var(--ratio), 3);
+    --step-up-4: pow(var(--ratio), 4);
+    --step-up-5: pow(var(--ratio), 5);
+    --step-up-6: pow(var(--ratio), 6);
+    --step-up-7: pow(var(--ratio), 7);
+    --step-up-8: pow(var(--ratio), 8);
+    --step-up-9: pow(var(--ratio), 9);
+    --step-up-10: pow(var(--ratio), 10);
+    --step-up-n1: calc(-1 * var(--step-up-1));
+    --step-up-n2: calc(-1 * var(--step-up-2));
+    --step-up-n3: calc(-1 * var(--step-up-3));
+    --step-up-n4: calc(-1 * var(--step-up-4));
+    --step-up-n5: calc(-1 * var(--step-up-5));
+    --step-up-n6: calc(-1 * var(--step-up-6));
+    --step-up-n7: calc(-1 * var(--step-up-7));
+    --step-up-n8: calc(-1 * var(--step-up-8));
+    --step-up-n9: calc(-1 * var(--step-up-9));
+    --step-up-n10: calc(-1 * var(--step-up-10));
+    --step-down-1: pow(var(--ratio), -1);
+    --step-down-2: pow(var(--ratio), -2);
+    --step-down-3: pow(var(--ratio), -3);
+    --step-down-4: pow(var(--ratio), -4);
+    --step-down-5: pow(var(--ratio), -5);
+    --step-down-6: pow(var(--ratio), -6);
+    --step-down-7: pow(var(--ratio), -7);
+    --step-down-8: pow(var(--ratio), -8);
+    --step-down-9: pow(var(--ratio), -9);
+    --step-down-10: pow(var(--ratio), -10);
+    --step-down-n1: calc(-1 * var(--step-down-1));
+    --step-down-n2: calc(-1 * var(--step-down-2));
+    --step-down-n3: calc(-1 * var(--step-down-3));
+    --step-down-n4: calc(-1 * var(--step-down-4));
+    --step-down-n5: calc(-1 * var(--step-down-5));
+    --step-down-n6: calc(-1 * var(--step-down-6));
+    --step-down-n7: calc(-1 * var(--step-down-7));
+    --step-down-n8: calc(-1 * var(--step-down-8));
+    --step-down-n9: calc(-1 * var(--step-down-9));
+    --step-down-n10: calc(-1 * var(--step-down-10));
+
+    --space-1: var(--base);
+    --space-2: calc(var(--base) * var(--step-up-1));
+    --space-3: calc(var(--base) * var(--step-up-2));
+    --space-4: calc(var(--base) * var(--step-up-3));
+    --space-5: calc(var(--base) * var(--step-up-4));
+    --space-6: calc(var(--base) * var(--step-up-5));
+    --space-7: calc(var(--base) * var(--step-up-6));
+    --space-8: calc(var(--base) * var(--step-up-7));
+    --space-9: calc(var(--base) * var(--step-up-8));
+    --space-10: calc(var(--base) * var(--step-up-9));
+
+    --fs-1: var(--space-4);
+    --fs-2: var(--space-6);
+    --fs-3: var(--space-8);
+    --fs-4: var(--space-10);
+
+    --lh-1: var(--ratio);
+    --lh-2: calc(var(--ratio) * 1.1);
+    --lh-3: calc(var(--ratio) * 1.2);
+    --lh-4: calc(var(--ratio) * 1.3);
+
+    --dur-0: 0ms;
+    --dur-1: 100ms;
+    --dur-2: 200ms;
+    --dur-3: 300ms;
+    --dur-4: 400ms;
+    --dur-5: 500ms;
+    --dur-6: 600ms;
+    --dur-7: 700ms;
+    --dur-8: 800ms;
+    --dur-9: 900ms;
+    --dur-10: 1000ms;
+
+    /* light tokens */
+    --night: #161612;
+    --sand: #eed1b5;
+    --dogwood: #d1b3ab;
+    --champagne: #f9e3d2;
+    --linen: #f5ebe0;
+
+    @media (color-gamut: p3) {
+      --night: color(display-p3 0.09 0.09 0.07);
+      --sand: color(display-p3 0.93 0.82 0.71);
+      --dogwood: color(display-p3 0.82 0.7 0.67);
+      --champagne: color(display-p3 0.98 0.89 0.82);
+      --linen: color(display-p3 0.96 0.92 0.88);
+    }
+
+    /* dark tokens */
+    --ivory: #edede9;
+    --buff: #dda369;
+    --ink: #140d07;
+    --raisin: #2f2825;
+    --rose: #5d3b32;
+
+    @media (color-gamut: p3) {
+      --ivory: color(display-p3 0.93 0.93 0.91);
+      --buff: color(display-p3 0.87 0.64 0.41);
+      --ink: color(display-p3 0.08 0.05 0.03);
+      --raisin: color(display-p3 0.18 0.16 0.15);
+      --rose: color(display-p3 0.36 0.23 0.2);
+    }
+
+    /* theme semantics */
+    --text: var(--night);
+    --spot: var(--sand);
+    --el-diminished: var(--dogwood);
+    --el-base: var(--champagne);
+    --el-accent: var(--linen);
+
+    @media (prefers-color-scheme: "dark") {
+      --text: var(--ivory);
+      --spot: var(--buff);
+      --el-diminished: var(--ink);
+      --el-base: var(--raisin);
+      --el-accent: var(--rose);
+    }
+  }
+}

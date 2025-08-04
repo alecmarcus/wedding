@@ -1,23 +1,13 @@
-import reset from "../../css/reset.css?url";
+import { Head } from "../components/Head";
 
-const TITLE = "Soyeon & Alec";
-
-const ROOT_ID = "root";
-const CLIENT_SCRIPT = "/src/client.tsx";
+const ROOT = "root";
 
 export const Document = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <title>{TITLE}</title>
-        <link rel="modulepreload" href={CLIENT_SCRIPT} />
-        <link rel="stylesheet" href={reset} />
-      </head>
-      <body>
-        <div id={ROOT_ID}>{children}</div>
-        <script type="module" src={CLIENT_SCRIPT} />
+      <Head />
+      <body className="fs-1 lh-1 ff-base no-sel">
+        <main id={ROOT}>{children}</main>
       </body>
     </html>
   );
